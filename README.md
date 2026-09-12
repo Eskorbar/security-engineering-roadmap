@@ -1,66 +1,66 @@
-# \# Security Engineering Roadmap
+##### \# Security Engineering Roadmap
 
-# 
+##### 
 
-# A 24-week hands-on journey to becoming a Security Architect 
+##### A 24-week hands-on journey to becoming a Security Architect
 
-# with a specialisation in Digital Forensics and Incident Response (DFIR).
+##### with a specialisation in Digital Forensics and Incident Response (DFIR).
 
-# 
+##### 
 
-# \## About me
+##### \## About me
 
-# \- Background: Electrical/Electronics Engineering, Kovo Labs co-founder
+\- Background: First class graduate of Computer Engineering, University of Uyo and Co-founder @Kovo Labs
+- Goal: Security Architect + DFIR specialisation
+---
 
-# \- Goal: Security Architect + DFIR specialisation
+##### \- Started: 12/09/2026
 
-# \- Started: \[today's date]
+##### 
 
-# 
+##### \## Progress tracker
 
-# \## Progress tracker
+##### | Phase | Topic | Status |
 
-# | Phase | Topic | Status |
+##### |---|---|---|
 
-# |---|---|---|
+##### | Phase 1 — Week 1 | Linux CLI \& log analysis | In progress |
 
-# | Phase 1 — Week 1 | Linux CLI \& log analysis | In progress |
+##### | Phase 1 — Week 2 | Disk forensics | Not started |
 
-# | Phase 1 — Week 2 | Disk forensics | Not started |
+##### | Phase 1 — Week 3 | Memory forensics | Not started |
 
-# | Phase 1 — Week 3 | Memory forensics | Not started |
+##### | Phase 2 — Week 4 | Cloud IAM hardening | Not started |
 
-# | Phase 2 — Week 4 | Cloud IAM hardening | Not started |
+##### 
 
-# 
+##### \## What I'm building
 
-# \## What I'm building
+##### \- Python security toolkit
 
-# \- Python security toolkit
+##### \- Secure AWS architecture (Terraform)
 
-# \- Secure AWS architecture (Terraform)
+##### \- DevSecOps pipeline
 
-# \- DevSecOps pipeline
+##### \- Full IR simulation report
 
-# \- Full IR simulation report
+##### \- Zero Trust Architecture design
 
-# \- Zero Trust Architecture design
+##### 
 
-# 
+##### \## Certifications
 
-# \## Certifications
+##### \- ✅ Google Cybersecurity Professional Certificate
 
-# \- ✅ Google Cybersecurity Professional Certificate
+##### \- ⬜ CompTIA Security+
 
-# \- ⬜ CompTIA Security+
+##### \- ⬜ AWS Security Specialty
 
-# \- ⬜ AWS Security Specialty
+##### \- ⬜ BTL1 — Blue Team Labs Level 1
 
-# \- ⬜ BTL1 — Blue Team Labs Level 1
+##### 
 
-# 
+##### \## Daily commitment
 
-# \## Daily commitment
-
-# Pushing something to this repo every single day.
+##### Pushing something to this repo every single day.
 
