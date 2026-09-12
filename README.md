@@ -1,2 +1,66 @@
-# security-engineering-roadmap
-A 12 weeks self study across forensics, architecture and log analysis
+# \# Security Engineering Roadmap
+
+# 
+
+# A 24-week hands-on journey to becoming a Security Architect 
+
+# with a specialisation in Digital Forensics and Incident Response (DFIR).
+
+# 
+
+# \## About me
+
+# \- Background: Electrical/Electronics Engineering, Kovo Labs co-founder
+
+# \- Goal: Security Architect + DFIR specialisation
+
+# \- Started: \[today's date]
+
+# 
+
+# \## Progress tracker
+
+# | Phase | Topic | Status |
+
+# |---|---|---|
+
+# | Phase 1 — Week 1 | Linux CLI \& log analysis | In progress |
+
+# | Phase 1 — Week 2 | Disk forensics | Not started |
+
+# | Phase 1 — Week 3 | Memory forensics | Not started |
+
+# | Phase 2 — Week 4 | Cloud IAM hardening | Not started |
+
+# 
+
+# \## What I'm building
+
+# \- Python security toolkit
+
+# \- Secure AWS architecture (Terraform)
+
+# \- DevSecOps pipeline
+
+# \- Full IR simulation report
+
+# \- Zero Trust Architecture design
+
+# 
+
+# \## Certifications
+
+# \- ✅ Google Cybersecurity Professional Certificate
+
+# \- ⬜ CompTIA Security+
+
+# \- ⬜ AWS Security Specialty
+
+# \- ⬜ BTL1 — Blue Team Labs Level 1
+
+# 
+
+# \## Daily commitment
+
+# Pushing something to this repo every single day.
+
