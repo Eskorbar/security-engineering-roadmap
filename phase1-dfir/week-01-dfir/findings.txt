@@ -66,10 +66,15 @@ Most useful forensic find commands:
 
 
 =============================================================
-SECTION 2: LOG ANALYSIS
+SECTION 2: FORENSIC ANALYSIS REPORT: auth.log
+Task: Phase 1 DFIR - Week 1 Linux Logs
+Date: September 14 and 15, 2026
 =============================================================
 
 === AUTH.LOG SSH BRUTE FORCE ANALYSIS ===
+Analysis of the 'auth.log' file indicates a persistent, automated SSH 
+brute force attack campaign targeting this system. Multiple external 
+IP addresses are attempting unauthorized credential guessing at high volume.
 
 WHAT I DID:
 Downloaded a sample auth.log file and ran grep/awk/sort/uniq
@@ -78,10 +83,22 @@ commands to analyse SSH authentication failures.
 WHAT I FOUND:
 - Multiple IP addresses made repeated failed SSH login attempts
 - Attacks were automated - too many attempts too fast for a human
+- Indicators: High frequency of 'authentication failure' logs spanning 
+  multiple days, targeted at administrative accounts (like root) from 
+  distinct external routing hosts (rhost).
 - The rhost= field identified attacker IP addresses
 - sort + uniq -c counted attempts per source IP
 - sort -rn ranked IPs from highest to lowest attempt count
 - Some IPs made 20+ attempts targeting username "root"
+-  Most Targeted Username: root
+- Total attempts on this user: 351
+ 
+TOP 3 ATTACKING IPs / HOSTNAMES
+------------------------------------------------------------------------
+1. IP/Host: 150.183.249.110 - 80 attempts
+2. IP/Host: n219076184117.netvigator.com - 23 attempts
+3. IP/Host: 207.243.167.114 - 23 attempts
+
 
 Attack profile: automated SSH brute-force (credential stuffing)
 The attacker is using a tool like Hydra or Medusa to cycle
@@ -97,10 +114,11 @@ If I found this on a real server I would:
    grep "Accepted password" auth.log
    (cross-reference those IPs against the attacker list)
 2. Block all attacking IPs at the firewall immediately
-3. Alert the SOC team with the IP list and timestamps
+3. Alert the SOC: Escalate to the Security Operations Center (SOC) 
+   and log an incident ticket.
 4. Check: is password authentication even enabled?
    (it should be disabled - SSH keys only)
-5. Recommend fail2ban to auto-block IPs after X failures
+5. Ensure fail2ban is active to auto-block IPs after X failures
 6. Recommend moving SSH to a non-standard port
 
 Key commands used:

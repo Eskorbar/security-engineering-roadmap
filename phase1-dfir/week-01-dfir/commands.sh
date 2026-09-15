@@ -35,8 +35,8 @@ ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat readme"
 # --- SSH USING A PRIVATE KEY INSTEAD OF PASSWORD ---
 # This is how ALL cloud servers (AWS EC2, DigitalOcean) authenticate
 # Structure: ssh -i keyfile username@hostname -p port
-ssh -i C:\Users\Eskor\bandit14.key bandit14@bandit.labs.overthewire.org -p 2220
-# -i C:\Users\Eskor\bandit14.key = use this private key file as your identity
+ssh -i C:\Users\Test\bandit14.key bandit14@bandit.labs.overthewire.org -p 2220
+# -i C:\Users\Test\bandit14.key = use this private key file as your identity
 # No password needed - the key proves who you are
 
 # --- HOW SSH KEY AUTHENTICATION WORKS ---
@@ -65,11 +65,11 @@ chmod 400 sshkey.private
 
 # --- SCP: COPY FILES SECURELY BETWEEN MACHINES ---
 # Structure: scp -P port source destination
-scp -P 2220 bandit13@bandit.labs.overthewire.org:~/sshkey.private C:\Users\Eskor\bandit14.key
+scp -P 2220 bandit13@bandit.labs.overthewire.org:~/sshkey.private C:\Test\Eskor\bandit14.key
 # -P 2220     = port (NOTE: capital P for scp, lowercase p for ssh)
 # source      = bandit13@server:~/sshkey.private (file on remote server)
 #               ~ means home directory on the remote machine
-# destination = C:\Users\Eskor\bandit14.key (where to save it locally)
+# destination = C:\Users\Test\bandit14.key (where to save it locally)
 # In real life: download a file from a server, upload config files, transfer logs
 
 
@@ -154,7 +154,7 @@ grep 'bandit.' auth.log
 grep -E 'root|admin|ubuntu' auth.log
 # | = OR - matches lines containing root OR admin OR ubuntu
 
-# --- FULL LOG ANALYSIS WORKFLOW (used in Week 1) ---
+# --- FULL LOG ANALYSIS WORKFLOW (used in Week 1 - 14th/09/2026) ---
 
 # Find top 10 attacking IPs:
 grep 'authentication failure' auth.log | grep -oE 'rhost=[^ ]+' | cut -d= -f2 | sort | uniq -c | sort -rn | head -10
