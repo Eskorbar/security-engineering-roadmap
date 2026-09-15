@@ -1,0 +1,573 @@
+=============================================================
+WEEK 1 - DFIR & Linux CLI: Findings and Analysis
+Security Engineering Roadmap - Eskor
+=============================================================
+Format for every entry:
+  WHAT I DID
+  WHAT I FOUND / WHAT I LEARNED
+  WHAT IT MEANS IN REAL LIFE
+=============================================================
+
+
+=============================================================
+SECTION 1: LINUX FUNDAMENTALS
+=============================================================
+
+=== HIDDEN FILES ===
+
+WHAT I DID:
+Navigated to the inhere/ directory and ran ls -la to reveal
+all files including hidden ones, then read the hidden file.
+
+WHAT I FOUND:
+Regular ls does not show files starting with a dot (.)
+Only ls -la reveals them - -a shows all, -l shows full details.
+
+WHAT IT MEANS IN REAL LIFE:
+Attackers hide malware, backdoors, and credential files as
+dotfiles because they're invisible to casual inspection.
+During an investigation, always run ls -la - NEVER just ls.
+The Prefetch folder, .bash_history, and .ssh/ directory are
+the first places investigators check for attacker activity.
+
+Real command to use in investigations:
+find / -name ".*" -type f 2>/dev/null
+(finds ALL hidden files on the entire system)
+
+
+=== FINDING FILES BY PROPERTIES ===
+
+WHAT I DID:
+Used the find command with filters to locate a specific file
+across many directories without knowing its location.
+
+WHAT I FOUND:
+find with filters locates files instantly by:
+  -type f        = file type
+  -size 1033c    = exact size in bytes
+  -user bandit7  = ownership
+  -group bandit6 = group membership
+  ! -executable  = NOT executable
+
+WHAT IT MEANS IN REAL LIFE:
+During incident response, you may know properties of an
+attacker-dropped file (size, type, permissions, owner) but
+not its location. find searches the entire server in seconds.
+
+Most useful forensic find commands:
+  find / -mtime -1 2>/dev/null
+  (files modified in the last 24 hours - attacker activity window)
+
+  find / -perm -4000 2>/dev/null
+  (SUID files - potential privilege escalation vectors)
+
+  find /tmp -type f 2>/dev/null
+  (attackers almost always stage files in /tmp)
+
+
+=============================================================
+SECTION 2: LOG ANALYSIS
+=============================================================
+
+=== AUTH.LOG SSH BRUTE FORCE ANALYSIS ===
+
+WHAT I DID:
+Downloaded a sample auth.log file and ran grep/awk/sort/uniq
+commands to analyse SSH authentication failures.
+
+WHAT I FOUND:
+- Multiple IP addresses made repeated failed SSH login attempts
+- Attacks were automated - too many attempts too fast for a human
+- The rhost= field identified attacker IP addresses
+- sort + uniq -c counted attempts per source IP
+- sort -rn ranked IPs from highest to lowest attempt count
+- Some IPs made 20+ attempts targeting username "root"
+
+Attack profile: automated SSH brute-force (credential stuffing)
+The attacker is using a tool like Hydra or Medusa to cycle
+through username/password combinations automatically.
+
+WHAT IT MEANS IN REAL LIFE:
+This is one of the most common attack patterns on any server
+exposed to the internet. Default SSH on port 22 is scanned
+and attacked constantly - every server faces this.
+
+If I found this on a real server I would:
+1. Check if any attempts SUCCEEDED:
+   grep "Accepted password" auth.log
+   (cross-reference those IPs against the attacker list)
+2. Block all attacking IPs at the firewall immediately
+3. Alert the SOC team with the IP list and timestamps
+4. Check: is password authentication even enabled?
+   (it should be disabled - SSH keys only)
+5. Recommend fail2ban to auto-block IPs after X failures
+6. Recommend moving SSH to a non-standard port
+
+Key commands used:
+  # Top attacking IPs
+  grep 'authentication failure' auth.log | grep -oE 'rhost=[^ ]+' | cut -d= -f2 | sort | uniq -c | sort -rn | head -10
+
+  # Most targeted usernames
+  grep 'authentication failure' auth.log | grep -oE 'user=[^ ]+' | cut -d= -f2 | sort | uniq -c | sort -rn | head -10
+
+  # Attacks per day
+  grep 'authentication failure' auth.log | awk '{print $1, $2}' | sort | uniq -c | sort -rn
+
+
+=============================================================
+SECTION 3: GREP - SEARCH AND PATTERN MATCHING
+=============================================================
+
+=== UNDERSTANDING GREP ===
+
+WHAT I DID:
+Used grep extensively for log analysis across multiple Bandit
+levels and the auth.log analysis exercise.
+
+WHAT I FOUND - HOW GREP WORKS:
+grep searches every line of a file for a pattern and returns
+matching lines. The power comes from flags and regex patterns.
+
+Critical flags:
+  -i  = case insensitive matching
+  -v  = invert (show lines that DON'T match - filter noise)
+  -o  = only print matched part (not whole line)
+  -E  = extended regex (enables +, |, (), etc.)
+  -oE = combined - extract exact patterns from messy text
+  -r  = recursive (search entire directory)
+  -a  = treat binary as text (Level 9 - strings in binary)
+  -c  = count matching lines only
+
+Regex patterns I use:
+  [^ ]+       = one or more non-space characters
+  [0-9]+      = one or more digits
+  ^word       = line starts with "word"
+  word$       = line ends with "word"
+  word1|word2 = matches word1 OR word2
+
+Most powerful combination for log analysis:
+  grep -oE 'rhost=[^ ]+' auth.log
+  Extracts ONLY the rhost=IP part from messy log lines
+  Without -oE you get the entire log line
+  With -oE you get exactly what you need
+
+WHAT IT MEANS IN REAL LIFE:
+grep is the first tool in every security investigation.
+Log files contain millions of lines - grep is how you find
+the 10 lines that matter. This skill is used in:
+  - SOC alert triage (find the relevant log entry)
+  - Incident response (extract attacker IPs, commands run)
+  - Threat hunting (search for known bad patterns)
+  - Malware analysis (Level 9 - extract strings from binary)
+
+
+=============================================================
+SECTION 4: SSH - SECURE SHELL
+=============================================================
+
+=== HOW SSH AUTHENTICATION WORKS ===
+
+WHAT I DID:
+Connected to Bandit servers using both password authentication
+and private key authentication. Transferred a private key from
+the server to my local machine using scp.
+
+WHAT I FOUND - TWO AUTHENTICATION METHODS:
+
+METHOD 1 - Password authentication:
+  You type your password. The server checks it.
+  Simple but weaker - passwords can be guessed or brute-forced.
+  This is what attackers target in SSH brute-force attacks.
+
+METHOD 2 - Key pair authentication (the correct way):
+  You have two mathematically linked files:
+    Private key = stays on YOUR machine only (bandit14.key)
+    Public key  = lives on the server (~/.ssh/authorized_keys)
+
+  When you connect with -i keyfile:
+    Your machine proves it has the private key
+    Server checks if the matching public key is in authorized_keys
+    If yes: access granted - no password ever transmitted
+
+  Why keys are stronger than passwords:
+    Keys are 2048-4096 bits - impossible to guess
+    No password transmitted over network - nothing to intercept
+    Compromised key requires physical access to your machine
+
+WHAT I DID FOR LEVEL 13:
+  1. Found sshkey.private in bandit13's home directory
+  2. Copied it to my local machine with scp
+  3. Fixed permissions with chmod 400 (SSH refuses over-permissive keys)
+  4. Used ssh -i to connect as bandit14
+
+WHAT IT MEANS IN REAL LIFE:
+  Every AWS EC2 instance uses SSH key authentication
+  GitHub uses SSH keys for repository access
+  All production Linux servers should disable password auth
+  A leaked private key = full server access (treat like a password)
+
+  AWS workflow is identical to what I did in Bandit:
+    AWS gives you a .pem file (private key) when you create EC2
+    You run: ssh -i mykey.pem ec2-user@ec2-ip-address
+    This is exactly what I practiced in Level 13
+
+
+=== SCP - SECURE COPY ===
+
+WHAT I DID:
+Used scp to transfer the private key from the Bandit server
+to my local Windows machine.
+
+WHAT I FOUND:
+  scp = Secure Copy - transfers files over SSH
+  Same security as SSH, same port
+  Note: scp uses -P (capital) for port, ssh uses -p (lowercase)
+
+  Structure: scp -P port source destination
+  Remote path format: username@hostname:~/path/to/file
+
+WHAT IT MEANS IN REAL LIFE:
+  Downloading log files from a compromised server for analysis
+  Uploading security tools to a remote server
+  Transferring evidence files during incident response
+  Backing up configuration files from production servers
+
+
+=============================================================
+SECTION 5: NETCAT - NETWORK CONNECTIONS
+=============================================================
+
+=== UNDERSTANDING NETCAT ===
+
+WHAT I DID:
+Used netcat in two modes - as a client connecting to a port
+(Level 14) and as a listener receiving connections (Level 20).
+
+WHAT I FOUND - HOW NETCAT WORKS:
+  nc is called the "Swiss army knife of networking" because it
+  can make or accept any TCP/UDP connection on any port.
+
+  CLIENT MODE (connect to something):
+    nc localhost 30000
+    Opens a raw connection to port 30000
+    Everything you type is sent to the service
+    Everything the service sends back appears on screen
+
+  LISTENER MODE (wait for connections):
+    nc -l -p 1234
+    Waits on port 1234 for incoming connections
+    Used in Level 20: Terminal 1 listens, Terminal 2 connects
+
+  SCAN MODE (check if port is open):
+    nc -zv localhost 30000-32000
+    -z = zero I/O (don't send data, just check)
+    -v = verbose (show results clearly)
+
+WHAT IT MEANS IN REAL LIFE:
+  Testing if a service is reachable on a specific port
+  Debugging network connectivity issues
+  Incident response: check what ports are open on a compromised server
+  Penetration testing: interact with services manually without a browser
+  Attackers use nc to create backdoors: nc -l -p 4444 -e /bin/bash
+  (this creates a command shell accessible over the network - a backdoor)
+
+
+=============================================================
+SECTION 6: SSL/TLS AND ENCRYPTED CONNECTIONS
+=============================================================
+
+=== UNDERSTANDING SSL/TLS ===
+
+WHAT I DID:
+Connected to an SSL/TLS encrypted service on the Bandit server
+using openssl s_client (Level 15).
+
+WHAT I FOUND - HOW SSL/TLS WORKS:
+
+  WITHOUT encryption (plain netcat):
+    Your machine ---[password: letmein]---> Server
+    Anyone watching the network reads: password: letmein
+
+  WITH SSL/TLS encryption:
+    Your machine ---[₯#@£∂ gibberish]---> Server
+    Anyone watching sees: unreadable encrypted data
+
+  SSL/TLS is the encryption layer under:
+    HTTPS (websites)
+    SMTPS (encrypted email)
+    Any service with SSL in its name
+
+  The openssl s_client command:
+    openssl s_client -connect localhost:30001 -ign_eof
+
+    openssl     = command line tool for encryption and SSL
+    s_client    = act as an SSL client (connect to a server)
+    -connect    = host:port to connect to
+    -ign_eof    = stay connected after input ends
+                  (without this: disconnects before server responds)
+
+  What you see on connection:
+    CONNECTED - certificate information - then "read R BLOCK"
+    "read R BLOCK" = connected and waiting for your input
+
+WHAT IT MEANS IN REAL LIFE:
+  Verify a website's SSL certificate is valid:
+    openssl s_client -connect website.com:443
+  Check when a certificate expires:
+    echo | openssl s_client -connect site.com:443 2>/dev/null | openssl x509 -noout -dates
+  Security engineers use this to:
+    Audit SSL configurations on client servers
+    Verify certificates before they expire and break services
+    Test if servers accept weak SSL versions (security vulnerability)
+    Pen testing: check what encryption standards a server supports
+
+
+=============================================================
+SECTION 7: PORT SCANNING
+=============================================================
+
+=== FINDING OPEN PORTS AND RUNNING SERVICES ===
+
+WHAT I DID:
+Scanned a port range to find which ports were running SSL
+services in Bandit Level 16.
+
+WHAT I FOUND - TWO TOOLS:
+
+  NETCAT scanning (simple):
+    nc -zv localhost 31000-32000
+    Fast, available everywhere, shows open/closed
+    Cannot detect what service is running
+
+  NMAP scanning (powerful):
+    nmap -sV localhost -p 31000-32000
+    -sV = service version detection
+    Shows: port number, state, what service is running
+    Output: 31790/tcp open ssl/http = SSL service on that port
+
+  Port states:
+    open     = something is actively listening here
+    closed   = reachable but nothing listening
+    filtered = firewall blocking - can't determine state
+
+WHAT IT MEANS IN REAL LIFE:
+  INCIDENT RESPONSE:
+    Scan a compromised server to find backdoors on unusual ports
+    Attackers often run C2 (command and control) on non-standard ports
+    Example: finding nc -l -p 4444 running as a backdoor
+
+  PENETRATION TESTING:
+    Find the attack surface on a target (what services are exposed)
+    Identify potentially vulnerable service versions
+
+  SECURITY AUDITS:
+    Verify only correct ports are open on production servers
+    Example: a database server should have ONLY port 5432 open
+    If port 22 is also open and unexpected - investigate immediately
+
+
+=============================================================
+SECTION 8: ENCODING AND OBFUSCATION
+=============================================================
+
+=== BASE64 (LEVEL 10) ===
+
+WHAT I DID:
+Decoded a base64 encoded file using the base64 -d command.
+
+WHAT I FOUND:
+Base64 converts binary or text data into a string of letters,
+numbers, and symbols (A-Z, a-z, 0-9, +, /).
+It always ends with = or == as padding.
+
+Encoded: VGhlIHBhc3N3b3JkIGlzIElIZjNJamFOWVJOaTBBbA==
+Decoded: The password is IHf3IjaNYRNi0Al
+
+WHAT IT MEANS IN REAL LIFE:
+Attackers use base64 to:
+  - Hide malicious commands from basic security filters
+  - Encode payloads in phishing emails and scripts
+  - Obfuscate PowerShell commands (PowerShell malware almost always uses base64)
+
+Example real-world attacker command:
+  powershell -enc VGhlIHBhc3N3b3Jk...
+  The -enc flag means the argument is base64 encoded
+  This is an immediate red flag when seen in Windows logs
+
+How to decode in investigation:
+  echo 'encoded_string' | base64 -d
+  Or: base64 -d filename
+
+
+=== ROT13 (LEVEL 11) ===
+
+WHAT I DID:
+Decoded a ROT13 encoded message using the tr command.
+
+WHAT I FOUND:
+ROT13 shifts every letter 13 positions in the alphabet.
+A becomes N, B becomes O, N becomes A (wraps around).
+Applying ROT13 twice returns the original text.
+
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+WHAT IT MEANS IN REAL LIFE:
+ROT13 is simple obfuscation - not real encryption.
+Appears occasionally in malware to hide obvious strings
+from basic pattern matching (but not from analysis).
+Knowing tr for character-level text transformation is
+useful for log parsing and data cleaning in security work.
+
+
+=== COMPRESSED ARCHIVES (LEVEL 12) ===
+
+WHAT I DID:
+Decompressed a file nested inside multiple layers of different
+compression formats to reach the final plaintext.
+
+WHAT I FOUND:
+Layer order encountered: gz -> bz2 -> tar -> gz -> bz2 -> tar -> bz2 -> gz -> ASCII
+
+The file command identifies file type regardless of extension:
+  file data.txt might say: "gzip compressed data"
+  Even if the extension says .txt - the file command tells truth
+
+Decompression commands:
+  gunzip file.gz      = decompress gzip
+  bunzip2 file.bz2    = decompress bzip2
+  tar -xf file.tar    = extract tar archive
+
+WHAT IT MEANS IN REAL LIFE:
+Attackers layer compression to:
+  - Slow down analysis (analyst has to unwrap many layers)
+  - Evade antivirus detection (signature scanning struggles with nested compression)
+  - Reduce file size of malware for delivery
+
+The file command is essential in malware triage because
+attackers routinely fake file extensions. An executable
+named "invoice.pdf" is identified as "PE32 executable" by
+the file command - not a PDF.
+
+
+=============================================================
+SECTION 9: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE
+=============================================================
+
+=== UNDERSTANDING CRON (LEVELS 21–23) ===
+
+WHAT I DID:
+Investigated cron jobs running as other users to find where
+they were writing data. Then wrote my own script that the
+cron job would execute.
+
+WHAT I FOUND - HOW CRON WORKS:
+Cron runs commands automatically on a schedule.
+Cron job files live in:
+  /etc/cron.d/         = system cron jobs
+  /etc/crontab         = main crontab file
+  /var/spool/cron/     = per-user crontab files
+  /etc/cron.hourly/    = scripts run every hour
+  /etc/cron.daily/     = scripts run every day
+
+Cron schedule format:
+  * * * * * user command
+  | | | | |
+  | | | | day of week (0=Sunday)
+  | | | month
+  | | day of month
+  | hour
+  minute
+
+Example: */1 * * * * bandit23 /usr/bin/cronjob_bandit23.sh
+(runs every minute as user bandit23)
+
+WHAT IT MEANS IN REAL LIFE:
+ATTACKER USE (MITRE ATT&CK T1053.003):
+  Attackers create cron jobs for persistence - they survive reboots
+  Even if you remove the malware, if the cron job remains, it reinstalls
+  Common technique: cron job that downloads and runs a script every minute
+
+DEFENDER RESPONSE:
+  During incident response, ALWAYS check all cron locations
+  Look for recently modified cron files (check timestamps)
+  Audit: does this cron job belong here? Was it always there?
+  
+  Commands to audit cron jobs:
+    cat /etc/crontab
+    ls -la /etc/cron.d/
+    ls -la /var/spool/cron/crontabs/
+    crontab -l (list current user's cron jobs)
+
+
+=============================================================
+SECTION 10: SUID BINARIES - PRIVILEGE ESCALATION
+=============================================================
+
+=== UNDERSTANDING SUID (LEVELS 19–20) ===
+
+WHAT I DID:
+Found a SUID binary, understood what it does, and used it to
+read a file belonging to another user.
+
+WHAT I FOUND - WHAT SUID MEANS:
+SUID = Set User ID - a special permission on executable files.
+
+When a file has SUID set, it runs as the FILE OWNER's user,
+not the user who executes it.
+
+How to spot a SUID file:
+  ls -la
+  -rwsr-xr-x   (the 's' in the owner execute position = SUID set)
+  -rwSr-xr-x   (capital 'S' = SUID set but not executable - unusual)
+
+In Bandit Level 19:
+  The binary was owned by bandit20 and had SUID set
+  When I ran it, it executed as bandit20
+  This let me read /etc/bandit_pass/bandit20 (only readable by bandit20)
+
+WHAT IT MEANS IN REAL LIFE:
+LEGITIMATE USE:
+  passwd command uses SUID to let any user change their own password
+  (it needs root access to modify /etc/shadow)
+  ping uses SUID to access raw network sockets
+
+ATTACKER USE (MITRE ATT&CK T1548.001):
+  Attackers create SUID binaries to maintain privilege after a breach
+  If an attacker plants a SUID bash binary:
+    /bin/bash -p (runs as root regardless of who executes it)
+  This is a classic privilege escalation and persistence technique
+
+DEFENDER RESPONSE:
+  Audit SUID files - any unexpected SUID binary is suspicious
+  Command to find ALL SUID files on the system:
+    find / -perm -4000 -type f 2>/dev/null
+  Compare against a known-good baseline - new SUID files need investigation
+
+
+=============================================================
+WEEK 1 - TOP 5 TAKEAWAYS
+=============================================================
+
+1. THE ANOMALY IS ALWAYS THE THREAT
+   sort | uniq -u thinking - the unique event in a sea of repetition
+   is where attacker activity hides. This applies to every log analysis task.
+
+2. DOCUMENTATION IS THE DISCIPLINE
+   Security engineers document everything - commands run, findings made,
+   evidence chain maintained. Without documentation, investigation findings
+   are inadmissible and unrepeatable.
+
+3. SSH KEYS ARE NOT OPTIONAL
+   Password authentication on SSH is the attack surface brute-force exploits.
+   Key-based authentication eliminates that attack vector entirely.
+   Every cloud server should use keys - no exceptions.
+
+4. ATTACKERS HIDE IN PLAIN SIGHT
+   Hidden files, fake extensions, SUID binaries, cron jobs, masquerading
+   processes - all designed to look normal. Knowing what normal looks like
+   is the prerequisite for spotting what isn't.
+
+5. TOOLS ARE NOT THE SKILL - METHODOLOGY IS
+   grep, nc, openssl, find - these are instruments.
+   Knowing WHEN to use them and WHAT to look for is the actual skill.
+   That comes from understanding how attackers think and operate.
