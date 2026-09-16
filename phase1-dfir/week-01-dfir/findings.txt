@@ -467,7 +467,80 @@ the file command - not a PDF.
 
 
 =============================================================
-SECTION 9: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE
+SECTION 9: SUID BINARIES - PRIVILEGE ESCALATION
+=============================================================
+
+=== UNDERSTANDING SUID (LEVELS 19–20) ===
+
+WHAT I DID:
+Found a SUID binary, understood what it does, and used it to
+read a file belonging to another user.
+
+
+*WHAT I FOUND - WHAT SUID MEANS:*
+SUID = Set User ID - a special permission on executable files.
+
+When a file has SUID set, it runs as the FILE OWNER's user,
+not the user who executes it.
+
+Inter-Process Communication: Level 20 required leveraging an active 
+  Local Listener via Netcat ('nc -l -p') to bridge raw string payloads 
+  across distinct terminal instances via local socket binding.
+
+
+How to spot a SUID file:
+  ls -la
+  -rwsr-xr-x   (the 's' in the owner execute position = SUID set)
+  -rwSr-xr-x   (capital 'S' = SUID set but not executable - unusual)
+
+In Bandit Level 19:
+  The binary was owned by bandit20 and had SUID set
+  When I ran it, it executed as bandit20
+  This let me read /etc/bandit_pass/bandit20 (only readable by bandit20)
+
+WHAT IT MEANS IN REAL LIFE:
+LEGITIMATE USE:
+  passwd command uses SUID to let any user change their own password
+  (it needs root access to modify /etc/shadow)
+  ping uses SUID to access raw network sockets
+
+ATTACKER USE (MITRE ATT&CK T1548.001):
+  Attackers create SUID binaries to maintain privilege after a breach
+  If an attacker plants a SUID bash binary:
+    /bin/bash -p (runs as root regardless of who executes it)
+  This is a classic privilege escalation and persistence technique
+
+DEFENDER RESPONSE:
+  Audit SUID files - any unexpected SUID binary is suspicious
+  Command to find ALL SUID files on the system:
+    find / -perm -4000 -type f 2>/dev/null
+  Compare against a known-good baseline - new SUID files need investigation
+
+
+=============================================================
+SECTION 10: SECTION 3: SYSTEM attack SURFACE ASSESSMENT (Windows Host Scan)
+=============================================================
+
+- WHAT I DID: 
+  Executed a local loopback port and service version audit against my 
+  personal machine interface using the Windows Network Mapper binary:
+  '& "C:\Program Files (x86)\Nmap\nmap.exe" -sV 127.0.0.1'.
+
+- WHAT I FOUND / WHAT I LEARNED: 
+  I discovered four open local network communication channels: 
+  Port 135 (MSRPC), Port 139 (NetBIOS), Port 445 (SMB), and Port 16992 (Intel AMT).
+
+- WHAT IT MEANS IN REAL LIFE: 
+  Operating systems leave background communication lines open by default 
+  to share files or find network printers over Wi-Fi. While safe behind 
+  a router firewall, exposed internal file paths like Port 445 (SMB) are 
+  heavily targeted by massive global ransomware strains (like WannaCry). 
+  Setting connection profiles to 'Public' acts as an internal shield, 
+  blocking these doors from listening to malicious neighbors on local Wi-Fi.
+
+
+=============================================================
+SECTION 11: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE
 =============================================================
 
 === UNDERSTANDING CRON (LEVELS 21–23) ===
@@ -514,51 +587,6 @@ DEFENDER RESPONSE:
     ls -la /etc/cron.d/
     ls -la /var/spool/cron/crontabs/
     crontab -l (list current user's cron jobs)
-
-
-=============================================================
-SECTION 10: SUID BINARIES - PRIVILEGE ESCALATION
-=============================================================
-
-=== UNDERSTANDING SUID (LEVELS 19–20) ===
-
-WHAT I DID:
-Found a SUID binary, understood what it does, and used it to
-read a file belonging to another user.
-
-WHAT I FOUND - WHAT SUID MEANS:
-SUID = Set User ID - a special permission on executable files.
-
-When a file has SUID set, it runs as the FILE OWNER's user,
-not the user who executes it.
-
-How to spot a SUID file:
-  ls -la
-  -rwsr-xr-x   (the 's' in the owner execute position = SUID set)
-  -rwSr-xr-x   (capital 'S' = SUID set but not executable - unusual)
-
-In Bandit Level 19:
-  The binary was owned by bandit20 and had SUID set
-  When I ran it, it executed as bandit20
-  This let me read /etc/bandit_pass/bandit20 (only readable by bandit20)
-
-WHAT IT MEANS IN REAL LIFE:
-LEGITIMATE USE:
-  passwd command uses SUID to let any user change their own password
-  (it needs root access to modify /etc/shadow)
-  ping uses SUID to access raw network sockets
-
-ATTACKER USE (MITRE ATT&CK T1548.001):
-  Attackers create SUID binaries to maintain privilege after a breach
-  If an attacker plants a SUID bash binary:
-    /bin/bash -p (runs as root regardless of who executes it)
-  This is a classic privilege escalation and persistence technique
-
-DEFENDER RESPONSE:
-  Audit SUID files - any unexpected SUID binary is suspicious
-  Command to find ALL SUID files on the system:
-    find / -perm -4000 -type f 2>/dev/null
-  Compare against a known-good baseline - new SUID files need investigation
 
 
 =============================================================

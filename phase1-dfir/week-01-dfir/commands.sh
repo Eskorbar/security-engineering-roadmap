@@ -9,6 +9,199 @@
 
 
 # =============================================================
+# BANDIT LEVEL SOLUTIONS
+# Commands used at each level - documented for reference
+# Passwords stored in Google Drive ONLY - never pushed to GitHub
+# =============================================================
+
+# --- LEVEL 0: SSH into the game server ---
+ssh bandit0@bandit.labs.overthewire.org -p 2220
+# Lesson: basic SSH connection - this is how you access every cloud server
+
+# --- LEVEL 1: Read a file in home directory ---
+cat readme
+# cat = concatenate and print - reads a file and outputs contents to terminal
+# Lesson: cat is the fastest way to read any file on a Linux system
+
+# --- LEVEL 2: File with special character "-" in name ---
+cat ./-
+# ./ prefix tells Linux this is a file path, not a command flag
+# Without ./: cat - means "read from keyboard input" (not a file)
+# Lesson: attackers name files with special characters to confuse admins
+
+# --- LEVEL 3: File with spaces in the name ---
+cat "spaces in this filename"
+# Alternative: cat spaces\ in\ this\ filename (backslash escapes each space)
+# Lesson: always quote or escape filenames with unusual characters
+
+# --- LEVEL 4: Hidden file inside a directory ---
+cd inhere/
+ls -la
+# -l = long format (shows permissions, owner, size)
+# -a = all files including hidden (files starting with . are hidden in Linux)
+# Then: cat .hidden
+# Lesson: always use ls -la in investigations - never just ls
+#         Hidden files starting with . are a common attacker technique
+
+# --- LEVEL 5: Find file by specific properties ---
+find inhere/ -type f -size 1033c ! -executable | xargs cat
+# find        = search for files/directories
+# inhere/     = search inside this directory
+# -type f     = files only (not directories)
+# -size 1033c = exactly 1033 bytes (c = bytes, k = kilobytes, M = megabytes)
+# ! -executable = NOT executable
+# | xargs cat = pipe the found filename to cat (reads it immediately)
+# Lesson: find files by properties during incident response -
+#         attackers drop files in unexpected locations
+
+# --- LEVEL 6: Find file owned by specific user and group ---
+find / -user bandit7 -group bandit6 -size 33c 2>/dev/null | xargs cat
+# /           = search entire system from root
+# -user       = owned by this user
+# -group      = belonging to this group
+# 2>/dev/null = redirect all errors (Permission denied) to /dev/null (discard them)
+#               Without this: hundreds of error lines flood your output
+# Lesson: hunt files by ownership across an entire server
+#         Used to find attacker-created files during incident response
+
+# --- LEVEL 7: Find text next to a keyword ---
+grep "millionth" data.txt
+# Searches data.txt for the line containing "millionth"
+# Lesson: grep searches millions of lines instantly - core log analysis skill
+
+# --- LEVEL 8: Find the unique line ---
+sort data.txt | uniq -u
+# sort    = alphabetically sort all lines (groups duplicate lines together)
+# uniq -u = show only lines that appear exactly ONCE (unique)
+# Lesson: finding anomalies - the unique event is usually the suspicious one
+
+# --- LEVEL 9: Extract readable strings from binary file ---
+strings data.txt | grep '=='
+# strings = extract all human-readable text sequences from a binary file
+# | grep '==' = filter for lines containing == (the password marker)
+# Lesson: first tool malware analysts run on a suspicious binary
+#         Extracts hardcoded URLs, IPs, file paths, registry keys without executing it
+
+# --- LEVEL 10: Decode base64 ---
+base64 -d data.txt
+# base64 -d = decode base64 encoded data back to plain text
+# Alternative: cat data.txt | base64 --decode
+# Lesson: attackers encode payloads in base64 to evade detection
+#         PowerShell malware almost always uses base64 encoding
+
+# --- LEVEL 11: Decode ROT13 ---
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+# tr = translate/replace characters
+# 'A-Za-z'       = input: all letters A through Z (upper and lower)
+# 'N-ZA-Mn-za-m' = output: shift each letter 13 positions (ROT13)
+# Example: A becomes N, B becomes O, N becomes A (wraps around)
+# Lesson: simple obfuscation - appears in CTFs and occasionally real malware
+
+# --- LEVEL 12: Decompress multiple nested archives ---
+# First: make a working directory (can't write to /tmp directly)
+mkdir /tmp/workdir && cp data.txt /tmp/workdir/ && cd /tmp/workdir
+
+# Identify file type regardless of extension:
+file data.txt
+# file command reads the file header to identify type
+# More reliable than file extension (extensions can be faked)
+
+# Then decompress based on what file command tells you:
+mv data.txt data.gz && gunzip data.gz       # for .gz files
+bunzip2 filename.bz2                         # for .bz2 files
+tar -xf filename.tar                         # for .tar archives
+# Repeat: file -> rename -> decompress until you reach ASCII text
+# Lesson: attackers layer compression to slow down analysis and evade detection
+
+# --- LEVEL 13: SSH using private key ---
+# Copy key from server to local machine:
+scp -P 2220 bandit13@bandit.labs.overthewire.org:~/sshkey.private C:\Users\Eskor\bandit14.key
+# Fix permissions:
+chmod 400 C:\Users\Eskor\bandit14.key
+# Connect using the key:
+ssh -i C:\Users\Eskor\bandit14.key bandit14@bandit.labs.overthewire.org -p 2220
+# Read the password file once inside:
+cat /etc/bandit_pass/bandit14
+# Lesson: SSH key authentication is how all cloud servers work
+#         AWS EC2, GitHub, and all production servers use this exact method
+
+# --- LEVEL 14: Connect to a port with netcat ---
+nc localhost 30000
+# Paste the level 14 password when prompted
+# Lesson: netcat is the Swiss army knife of networking
+#         Used to test ports, send data, debug services, and create listeners
+
+# --- LEVEL 15: SSL encrypted connection ---
+openssl s_client -connect localhost:30001 -ign_eof
+# Connect and paste the level 15 password when you see "read R BLOCK"
+# Lesson: SSL/TLS is the encryption layer under HTTPS
+#         openssl s_client lets you interact with encrypted services by hand
+
+# --- LEVEL 16: Find open SSL ports then connect ---
+# First scan to find which ports are open:
+nmap -sV localhost -p 31000-32000
+# Or using netcat:
+nc -zv localhost 31000-32000
+# Then connect to the port running SSL:
+openssl s_client -connect localhost:31790 -ign_eof
+# Paste the level 16 password - receive an RSA private key in response
+# Lesson: port scanning finds what services are running and where
+#         Used in penetration testing and incident response
+
+# --- LEVEL 17: Compare two files to find the changed line ---
+diff passwords.old passwords.new
+# diff = show differences between two files
+# Lines with < = only in the first file (old)
+# Lines with > = only in the second file (new)
+# The line only in passwords.new is the password
+# Lesson: diff is used in security to compare config files before and after changes
+#         Attackers who modify configs leave traces that diff reveals
+
+# --- LEVEL 18: The Shell escape ---
+ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat readme"
+# I tried to ssh into bandit18 servers but I was immediately logged out with a "bye bye" message
+# The solution was to run a command on the server without opening an interactive shell:
+# The server forces the command cat readme to run instantly, prints Level 19 password to tthe screen, and then closes the connection.
+# Lesson: attackers can lock you out of a server by modifying your shell
+#         You can still run commands remotely without an interactive shell
+# Interactive shells and automated execution profiles (.bashrc) are two different phases of a login sequence.
+#           If an administrator places a guard at the front door to kick you out,
+#           passing a direct command via SSH is like shouting your request through an open window instead of walking through the door.
+#           The system processes the request first, outputs the data, and then gracefully closes the session
+
+# --- LEVEL 19: The Shell escape ---
+./bandit20-do ls /etc/bandit_pass
+./bandit20-do cat /etc/bandit_pass/bandit20
+# The bandit20-do program is a setuid binary that runs as the bandit20 user.
+# It only allows the ls and cat commands, but it is vulnerable to shell escape.
+# By running ./bandit20-do ls /etc/bandit_pass, I can see the password file for bandit20.
+# Then I can run ./bandit20-do cat /etc/bandit_pass/bandit20 to read the password for bandit20.
+# Lesson: attackers can exploit poorly written programs to gain access to sensitive files
+#         Always check for setuid binaries and test them for vulnerabilities
+
+# --- LEVEL 20: Netcat local socket binding & multi-terminal verification handshake ---
+# WHAT I DID: Created a local socket listening post to link data across processes.
+# Window 1 (Listener Setup):
+nc -l -p 54321
+# Window 2 (SUID Connection Initiation):
+./suconnect 54321
+# Window 1 (Listener Output):
+# The suconnect program connects to the listener on port 54321 and sends the password for bandit21
+# Lesson: netcat can be used to create local sockets for inter-process communication
+#         This technique is useful for testing and debugging services that require multiple connections
+
+
+
+# =====================================================================
+# SYSTEM SECURITY AUDITING (NMAP EXECUTIONS)
+# =====================================================================
+
+# SYSTEM AUDIT: Profile local hardware environment attack surface vulnerabilities.
+# WHAT I DID: Ran an inside-out network mapping scan using the Windows binary path.
+& "C:\Program Files (x86)\Nmap\nmap.exe" -sV 127.0.0.1
+
+
+# =============================================================
 # SECTION 1: SSH - SECURE SHELL
 # How to connect to remote Linux servers securely
 # =============================================================
@@ -297,153 +490,3 @@ nmap -p- localhost
 # Incident response: scan a compromised server to find backdoors on unusual ports
 # Penetration testing: find the attack surface on a target
 # Security audits: verify only the correct ports are open on your production servers
-
-
-# =============================================================
-# SECTION 6: BANDIT LEVEL SOLUTIONS
-# Commands used at each level - documented for reference
-# Passwords stored in Google Drive ONLY - never pushed to GitHub
-# =============================================================
-
-# --- LEVEL 0: SSH into the game server ---
-ssh bandit0@bandit.labs.overthewire.org -p 2220
-# Lesson: basic SSH connection - this is how you access every cloud server
-
-# --- LEVEL 1: Read a file in home directory ---
-cat readme
-# cat = concatenate and print - reads a file and outputs contents to terminal
-# Lesson: cat is the fastest way to read any file on a Linux system
-
-# --- LEVEL 2: File with special character "-" in name ---
-cat ./-
-# ./ prefix tells Linux this is a file path, not a command flag
-# Without ./: cat - means "read from keyboard input" (not a file)
-# Lesson: attackers name files with special characters to confuse admins
-
-# --- LEVEL 3: File with spaces in the name ---
-cat "spaces in this filename"
-# Alternative: cat spaces\ in\ this\ filename (backslash escapes each space)
-# Lesson: always quote or escape filenames with unusual characters
-
-# --- LEVEL 4: Hidden file inside a directory ---
-cd inhere/
-ls -la
-# -l = long format (shows permissions, owner, size)
-# -a = all files including hidden (files starting with . are hidden in Linux)
-# Then: cat .hidden
-# Lesson: always use ls -la in investigations - never just ls
-#         Hidden files starting with . are a common attacker technique
-
-# --- LEVEL 5: Find file by specific properties ---
-find inhere/ -type f -size 1033c ! -executable | xargs cat
-# find        = search for files/directories
-# inhere/     = search inside this directory
-# -type f     = files only (not directories)
-# -size 1033c = exactly 1033 bytes (c = bytes, k = kilobytes, M = megabytes)
-# ! -executable = NOT executable
-# | xargs cat = pipe the found filename to cat (reads it immediately)
-# Lesson: find files by properties during incident response -
-#         attackers drop files in unexpected locations
-
-# --- LEVEL 6: Find file owned by specific user and group ---
-find / -user bandit7 -group bandit6 -size 33c 2>/dev/null | xargs cat
-# /           = search entire system from root
-# -user       = owned by this user
-# -group      = belonging to this group
-# 2>/dev/null = redirect all errors (Permission denied) to /dev/null (discard them)
-#               Without this: hundreds of error lines flood your output
-# Lesson: hunt files by ownership across an entire server
-#         Used to find attacker-created files during incident response
-
-# --- LEVEL 7: Find text next to a keyword ---
-grep "millionth" data.txt
-# Searches data.txt for the line containing "millionth"
-# Lesson: grep searches millions of lines instantly - core log analysis skill
-
-# --- LEVEL 8: Find the unique line ---
-sort data.txt | uniq -u
-# sort    = alphabetically sort all lines (groups duplicate lines together)
-# uniq -u = show only lines that appear exactly ONCE (unique)
-# Lesson: finding anomalies - the unique event is usually the suspicious one
-
-# --- LEVEL 9: Extract readable strings from binary file ---
-strings data.txt | grep '=='
-# strings = extract all human-readable text sequences from a binary file
-# | grep '==' = filter for lines containing == (the password marker)
-# Lesson: first tool malware analysts run on a suspicious binary
-#         Extracts hardcoded URLs, IPs, file paths, registry keys without executing it
-
-# --- LEVEL 10: Decode base64 ---
-base64 -d data.txt
-# base64 -d = decode base64 encoded data back to plain text
-# Alternative: cat data.txt | base64 --decode
-# Lesson: attackers encode payloads in base64 to evade detection
-#         PowerShell malware almost always uses base64 encoding
-
-# --- LEVEL 11: Decode ROT13 ---
-cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
-# tr = translate/replace characters
-# 'A-Za-z'       = input: all letters A through Z (upper and lower)
-# 'N-ZA-Mn-za-m' = output: shift each letter 13 positions (ROT13)
-# Example: A becomes N, B becomes O, N becomes A (wraps around)
-# Lesson: simple obfuscation - appears in CTFs and occasionally real malware
-
-# --- LEVEL 12: Decompress multiple nested archives ---
-# First: make a working directory (can't write to /tmp directly)
-mkdir /tmp/workdir && cp data.txt /tmp/workdir/ && cd /tmp/workdir
-
-# Identify file type regardless of extension:
-file data.txt
-# file command reads the file header to identify type
-# More reliable than file extension (extensions can be faked)
-
-# Then decompress based on what file command tells you:
-mv data.txt data.gz && gunzip data.gz       # for .gz files
-bunzip2 filename.bz2                         # for .bz2 files
-tar -xf filename.tar                         # for .tar archives
-# Repeat: file -> rename -> decompress until you reach ASCII text
-# Lesson: attackers layer compression to slow down analysis and evade detection
-
-# --- LEVEL 13: SSH using private key ---
-# Copy key from server to local machine:
-scp -P 2220 bandit13@bandit.labs.overthewire.org:~/sshkey.private C:\Users\Eskor\bandit14.key
-# Fix permissions:
-chmod 400 C:\Users\Eskor\bandit14.key
-# Connect using the key:
-ssh -i C:\Users\Eskor\bandit14.key bandit14@bandit.labs.overthewire.org -p 2220
-# Read the password file once inside:
-cat /etc/bandit_pass/bandit14
-# Lesson: SSH key authentication is how all cloud servers work
-#         AWS EC2, GitHub, and all production servers use this exact method
-
-# --- LEVEL 14: Connect to a port with netcat ---
-nc localhost 30000
-# Paste the level 14 password when prompted
-# Lesson: netcat is the Swiss army knife of networking
-#         Used to test ports, send data, debug services, and create listeners
-
-# --- LEVEL 15: SSL encrypted connection ---
-openssl s_client -connect localhost:30001 -ign_eof
-# Connect and paste the level 15 password when you see "read R BLOCK"
-# Lesson: SSL/TLS is the encryption layer under HTTPS
-#         openssl s_client lets you interact with encrypted services by hand
-
-# --- LEVEL 16: Find open SSL ports then connect ---
-# First scan to find which ports are open:
-nmap -sV localhost -p 31000-32000
-# Or using netcat:
-nc -zv localhost 31000-32000
-# Then connect to the port running SSL:
-openssl s_client -connect localhost:31790 -ign_eof
-# Paste the level 16 password - receive an RSA private key in response
-# Lesson: port scanning finds what services are running and where
-#         Used in penetration testing and incident response
-
-# --- LEVEL 17: Compare two files to find the changed line ---
-diff passwords.old passwords.new
-# diff = show differences between two files
-# Lines with < = only in the first file (old)
-# Lines with > = only in the second file (new)
-# The line only in passwords.new is the password
-# Lesson: diff is used in security to compare config files before and after changes
-#         Attackers who modify configs leave traces that diff reveals
