@@ -84,13 +84,12 @@ WHAT I FOUND:
 - Multiple IP addresses made repeated failed SSH login attempts
 - Attacks were automated - too many attempts too fast for a human
 - Indicators: High frequency of 'authentication failure' logs spanning 
-  multiple days, targeted at administrative accounts (like root) from 
-  distinct external routing hosts (rhost).
+  multiple days, targeted at administrative accounts (351 root, 17 guest, 4 test) from distinct external routing hosts (rhost).
 - The rhost= field identified attacker IP addresses
 - sort + uniq -c counted attempts per source IP
 - sort -rn ranked IPs from highest to lowest attempt count
 - Some IPs made 20+ attempts targeting username "root"
--  Most Targeted Username: root
+- Most Targeted Username: root
 - Total attempts on this user: 351
  
 TOP 3 ATTACKING IPs / HOSTNAMES
