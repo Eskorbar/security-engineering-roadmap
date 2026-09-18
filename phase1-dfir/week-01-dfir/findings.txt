@@ -467,7 +467,7 @@ the file command - not a PDF.
 
 
 =============================================================
-SECTION 9: SUID BINARIES - PRIVILEGE ESCALATION
+SECTION 9: SUID BINARIES - PRIVILEGE ESCALATION   17/09/2026
 =============================================================
 
 === UNDERSTANDING SUID (LEVELS 19–20) ===
@@ -540,7 +540,7 @@ SECTION 10: SECTION 3: SYSTEM attack SURFACE ASSESSMENT (Windows Host Scan)
 
 
 =============================================================
-SECTION 11: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE
+SECTION 11: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE 18/09/2026
 =============================================================
 
 === UNDERSTANDING CRON (LEVELS 21–23) ===
@@ -587,6 +587,27 @@ DEFENDER RESPONSE:
     ls -la /etc/cron.d/
     ls -la /var/spool/cron/crontabs/
     crontab -l (list current user's cron jobs)
+
+------------------------------------------------------------------------
+ATTACKER PERSISTENCE VIA JOB INJECTION (Bandit Level 23) 18/09/2026
+------------------------------------------------------------------------
+- WHAT I DID:
+  Created a custom Bash exfiltration script, assigned universal execution 
+  rights ('chmod 777'), and dropped the file into an active cron spool 
+  directory to manipulate an automated root-level process into copying data flags.
+
+- WHAT I FOUND / WHAT I LEARNED:
+  I learned how a lower-privilege account can manipulate an automated script 
+  runner to execute malicious commands with higher privilege levels, mapped 
+  directly to the MITRE ATT&CK Framework: T1053.003 (Scheduled Task/Job: Cron).
+
+- WHAT IT MEANS IN REAL LIFE:
+  Real-world attackers don't want to break into a network once and lose access 
+  if a machine restarts or if an employee changes their password. They hide 
+  silent scripts inside system schedulers. Even if security responders clean the 
+  servers, the underlying "alarm clock" daemon will execute the attacker's hidden 
+  file on schedule, opening a backdoor back to the hacker automatically.
+========================================================================
 
 
 =============================================================
