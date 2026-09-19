@@ -8,6 +8,53 @@ Format for every entry:
   WHAT IT MEANS IN REAL LIFE
 =============================================================
 
+=============================================================
+WEEK 1 - TOP 8 TAKEAWAYS
+=============================================================
+
+1. THE ANOMALY IS ALWAYS THE THREAT
+   sort | uniq -u thinking - the unique event in a sea of repetition
+   is where attacker activity hides. This applies to every log analysis task.
+
+2. DOCUMENTATION IS THE DISCIPLINE
+   Security engineers document everything - commands run, findings made,
+   evidence chain maintained. Without documentation, investigation findings
+   are inadmissible and unrepeatable.
+
+3. SSH KEYS ARE NOT OPTIONAL
+   Password authentication on SSH is the attack surface brute-force exploits.
+   Key-based authentication eliminates that attack vector entirely.
+   Every cloud server should use keys - no exceptions.
+
+4. ATTACKERS HIDE IN PLAIN SIGHT
+   Hidden files, fake extensions, SUID binaries, cron jobs, masquerading
+   processes - all designed to look normal. Knowing what normal looks like
+   is the prerequisite for spotting what isn't.
+
+5. TOOLS ARE NOT THE SKILL - METHODOLOGY IS
+   grep, nc, openssl, find - these are instruments.
+   Knowing WHEN to use them and WHAT to look for is the actual skill.
+   That comes from understanding how attackers think and operate.
+
+6.  ATTACK SURFACE DEFENCE
+    Legacy application configurations dictate local vulnerability landscapes.
+    Running network security maps via tools like Nmap exposes background communication portals 
+    (such as Port 445/SMB). These entry lines act as critical vectors for severe,
+    wormable network exploits like EternalBlue unless firewall policies are actively isolated
+    to a strict "Public" stance on untrusted or shared Wi-Fi networks.
+    
+7.  PERSISTENCE MECHANISM EXPLOITATION
+    System scheduler engines—specifically automation daemons like Cron Jobs—are primary targets 
+    for threat actors seeking permanent, hidden access to infrastructure (MITRE ATT&CK T1053.003).
+    Leaving automated staging paths or task directories globally writable allows an attacker to
+    inject malicious execution payloads that the server will blindly execute on a loop with root privileges.
+
+8.  CLEARANCE AND PRIVILEGE ESCALATION
+    Minor design flaws in user execution barriers or file system parameters allow low-clearance accounts
+    to completely bypass authentication restrictions. Executing direct command parameters inline via a remote
+    connection string entirely sidesteps interactive desktop environment barriers like administrative .bashrc logout loops,
+    allowing responders or attackers to retrieve data before the profile can shut down.
+
 
 =============================================================
 SECTION 1: LINUX FUNDAMENTALS
@@ -180,6 +227,7 @@ the 10 lines that matter. This skill is used in:
 
 =============================================================
 SECTION 4: SSH - SECURE SHELL
+Date: September 14 and 15, 2026
 =============================================================
 
 === HOW SSH AUTHENTICATION WORKS ===
@@ -252,6 +300,7 @@ WHAT IT MEANS IN REAL LIFE:
 
 =============================================================
 SECTION 5: NETCAT - NETWORK CONNECTIONS
+Date: September 14 and 15, 2026
 =============================================================
 
 === UNDERSTANDING NETCAT ===
@@ -341,6 +390,7 @@ WHAT IT MEANS IN REAL LIFE:
 
 =============================================================
 SECTION 7: PORT SCANNING
+Date: September 14 and 15, 2026
 =============================================================
 
 === FINDING OPEN PORTS AND RUNNING SERVICES ===
@@ -467,7 +517,8 @@ the file command - not a PDF.
 
 
 =============================================================
-SECTION 9: SUID BINARIES - PRIVILEGE ESCALATION   17/09/2026
+SECTION 9: SUID BINARIES - PRIVILEGE ESCALATION   
+Date: September 17, 2026
 =============================================================
 
 === UNDERSTANDING SUID (LEVELS 19–20) ===
@@ -519,6 +570,7 @@ DEFENDER RESPONSE:
 
 =============================================================
 SECTION 10: SECTION 3: SYSTEM attack SURFACE ASSESSMENT (Windows Host Scan)
+Date: September 17, 2026
 =============================================================
 
 - WHAT I DID: 
@@ -540,7 +592,8 @@ SECTION 10: SECTION 3: SYSTEM attack SURFACE ASSESSMENT (Windows Host Scan)
 
 
 =============================================================
-SECTION 11: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE 18/09/2026
+SECTION 11: CRON JOBS - SCHEDULED TASKS AND PERSISTENCE
+Date: September 18, 2026
 =============================================================
 
 === UNDERSTANDING CRON (LEVELS 21–23) ===
@@ -589,7 +642,8 @@ DEFENDER RESPONSE:
     crontab -l (list current user's cron jobs)
 
 ------------------------------------------------------------------------
-ATTACKER PERSISTENCE VIA JOB INJECTION (Bandit Level 23) 18/09/2026
+ATTACKER PERSISTENCE VIA JOB INJECTION (Bandit Level 23)
+Date: September 18, 2026
 ------------------------------------------------------------------------
 - WHAT I DID:
   Created a custom Bash exfiltration script, assigned universal execution 
@@ -610,30 +664,3 @@ ATTACKER PERSISTENCE VIA JOB INJECTION (Bandit Level 23) 18/09/2026
 ========================================================================
 
 
-=============================================================
-WEEK 1 - TOP 5 TAKEAWAYS
-=============================================================
-
-1. THE ANOMALY IS ALWAYS THE THREAT
-   sort | uniq -u thinking - the unique event in a sea of repetition
-   is where attacker activity hides. This applies to every log analysis task.
-
-2. DOCUMENTATION IS THE DISCIPLINE
-   Security engineers document everything - commands run, findings made,
-   evidence chain maintained. Without documentation, investigation findings
-   are inadmissible and unrepeatable.
-
-3. SSH KEYS ARE NOT OPTIONAL
-   Password authentication on SSH is the attack surface brute-force exploits.
-   Key-based authentication eliminates that attack vector entirely.
-   Every cloud server should use keys - no exceptions.
-
-4. ATTACKERS HIDE IN PLAIN SIGHT
-   Hidden files, fake extensions, SUID binaries, cron jobs, masquerading
-   processes - all designed to look normal. Knowing what normal looks like
-   is the prerequisite for spotting what isn't.
-
-5. TOOLS ARE NOT THE SKILL - METHODOLOGY IS
-   grep, nc, openssl, find - these are instruments.
-   Knowing WHEN to use them and WHAT to look for is the actual skill.
-   That comes from understanding how attackers think and operate.
