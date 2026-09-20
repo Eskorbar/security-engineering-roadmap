@@ -11,10 +11,10 @@
 ## Progress tracker
 | **Phase** | **Topic** | **Status** |
 |---|---|---|
-| Phase 1 — Week 1 | Linux CLI \& log analysis | Done |
-| Phase 1 — Week 2 | Disk forensics | In progress  |
-| Phase 1 — Week 3 | Memory forensics | Not started |
-| Phase 2 — Week 4 | Cloud IAM hardening | Not started |
+| Phase 1 - Week 1 | Linux CLI \& log analysis | Done |
+| Phase 1 - Week 2 | Disk forensics | In progress  |
+| Phase 1 - Week 3 | Memory forensics | Not started |
+| Phase 2 - Week 4 | Cloud IAM hardening | Not started |
 
 
 ## What I'm building
@@ -41,4 +41,4 @@
 ## Daily commitment
 #### Pushing something to this repo every single day.
 
-# **Wish me luck!**
+# *Wish me luck!*
