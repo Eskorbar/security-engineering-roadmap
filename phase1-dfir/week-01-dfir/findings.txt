@@ -1,5 +1,5 @@
 =============================================================
-WEEK 1 - DFIR & Linux CLI: Findings and Analysis
+# WEEK 1 - DFIR & Linux CLI: Findings and Analysis*
 Security Engineering Roadmap - Eskor
 =============================================================
 Format for every entry:
@@ -13,7 +13,8 @@ WEEK 1 - TOP 8 TAKEAWAYS
 =============================================================
 
 1. THE ANOMALY IS ALWAYS THE THREAT
-   sort | uniq -u thinking - the unique event in a sea of repetition
+   sort | uniq -u 
+   thinking - the unique event in a sea of repetition
    is where attacker activity hides. This applies to every log analysis task.
 
 2. DOCUMENTATION IS THE DISCIPLINE
