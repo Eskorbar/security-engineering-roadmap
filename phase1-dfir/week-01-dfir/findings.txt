@@ -1,5 +1,5 @@
 =============================================================
-# WEEK 1 - DFIR & Linux CLI: Findings and Analysis*
+WEEK 1 - DFIR & Linux CLI: Findings and Analysis*
 Security Engineering Roadmap - Eskor
 =============================================================
 Format for every entry:
