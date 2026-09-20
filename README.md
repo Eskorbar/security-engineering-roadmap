@@ -1,42 +1,25 @@
-##### \# Security Engineering Roadmap
+# Security Engineering Roadmap
+#### A 24-week hands-on journey to becoming a Security Architect
+#### with a specialisation in Digital Forensics and Incident Response (DFIR).
 
-##### 
 
-##### A 24-week hands-on journey to becoming a Security Architect
-
-##### with a specialisation in Digital Forensics and Incident Response (DFIR).
-
-##### 
-
-##### \## About me
-
-\- Background: First class graduate of Computer Engineering, University of Uyo and Co-founder @Kovo Labs
-- Goal: Security Architect + DFIR specialisation
+## About me
+- Background: First class graduate of Computer Engineering, University of Uyo and Co-founder @Kovo Labs
+- - Goal: Security Architect + DFIR specialisation
 ---
+- Started: 12/09/2026
 
-##### \- Started: 12/09/2026
+## Progress tracker
+| **Phase** | **Topic** | **Status** |
+|---|---|---|
+| Phase 1 — Week 1 | Linux CLI \& log analysis | [x] |
+| Phase 1 — Week 2 | Disk forensics | [ ]  |
+| Phase 1 — Week 3 | Memory forensics | [ ] |
+| Phase 2 — Week 4 | Cloud IAM hardening | [ ] |
 
-##### 
 
-##### \## Progress tracker
-
-##### | Phase | Topic | Status |
-
-##### |---|---|---|
-
-##### | Phase 1 — Week 1 | Linux CLI \& log analysis | In progress |
-
-##### | Phase 1 — Week 2 | Disk forensics | Not started |
-
-##### | Phase 1 — Week 3 | Memory forensics | Not started |
-
-##### | Phase 2 — Week 4 | Cloud IAM hardening | Not started |
-
-##### 
-
-##### \## What I'm building
-
-##### \- Python security toolkit
+## What I'm building
+- Python security toolkit
 
 ##### \- Secure AWS architecture (Terraform)
 
