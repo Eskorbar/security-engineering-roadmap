@@ -1,2 +1,5 @@
 *.docx
 *.doc
+*.bandit-k
+*.tokens
+*.key
