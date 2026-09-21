@@ -488,7 +488,7 @@ echo | openssl s_client -connect google.com:443 2>/dev/null | openssl x509 -noou
 # SECTION 5: PORT SCANNING - FINDING WHAT'S RUNNING WHERE
 # =============================================================
 
-# --- SCAN WITH NETCAT (already covered above) ---
+# --- SCAN WITH NETCAT (already covered in section 3) ---
 nc -zv localhost 30000-32000
 # Fast, lightweight, available everywhere
 # Limitation: can't detect service type or version
