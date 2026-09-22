@@ -14,7 +14,7 @@ Date: September 22, 2026
   - Image Target: 2020JimmyWilson.E01 (891.29 MB)
   - Verified MD5 Hash: b267fb0cd94645425eee00258d3a9b58
   - Verified SHA-1 Hash: a1102c70a50768b588225fdcad6efa5d5d57341b
-  - Initial Ingest Metrics: Discovered 5 active user partitions, 376.91 MB of unallocated space, and 136 historical web browser artifacts.
+  - Initial Ingest Metrics: Found 4398 Allocated files, 3281 deleted files, Discovered 5 active user partitions, 376.91 MB of unallocated space, and 136 historical web browser artifacts.
 
 - WHAT I LEARNED:
   I learned that digital forensics mandates absolute data preservation. Investigators 
