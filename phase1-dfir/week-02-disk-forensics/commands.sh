@@ -3,7 +3,7 @@
 # Focus: Automated Task Tracking & Environmental Staging
 
 # =====================================================================
-# DAY 4: ARCHITECTURAL FRAMEWORK SETUP
+# DAY 5: ARCHITECTURAL FRAMEWORK SETUP
 # =====================================================================
 
 # Initialize Week 2 file structure to segment incoming forensic artifact data
@@ -18,7 +18,7 @@ touch phase1-dfir/week-02-disk-forensics/commands.sh
 touch phase1-dfir/week-02-disk-forensics/evidence-log.txt
 
 # =====================================================================
-# DAY 5: ARCHITECTURAL FRAMEWORK SETUP
+# DAY 6: ARCHITECTURAL FRAMEWORK SETUP
 # =====================================================================
 
 # WHAT I DID: Opened Autopsy and created a new case for the disk image analysis.
