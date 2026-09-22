@@ -21,13 +21,18 @@ touch phase1-dfir/week-02-disk-forensics/evidence-log.txt
 # DAY 6: ARCHITECTURAL FRAMEWORK SETUP
 # =====================================================================
 
-# WHAT I DID: Opened Autopsy and created a new case for the disk image analysis.
-# → Open Autopsy → click "New Case" → Case details → Click Next → Next → Finish
-# Added the disk image as a data source for analysis.
-# → Click "Add Data Source" → select "Disk Image or VM File" → Browse to image file
-# → click Next → Leave all ingest modules ticked → Click Finish 
-# When ingest finishes — I explored these sections in Autopsy:
-# Data Sources → expand the image → browse the folder structure
-# Extracted Content → Web History (see every site the user visited)
-# Extracted Content → Recent Documents
-# Views → Deleted Files (files the user thought were gone)
+# Audit data source entries within the forensic suite platform
+# WHAT I DID: Opened Autopsy, initialized a new analytical case database, 
+# and ingested the raw practice disk image container to extract live and deleted filesystem fragments.
+# 
+# Step 1: Open Autopsy -> click "New Case" -> Input case details -> Click Next -> Next -> Finish
+# Step 2: Click "Add Data Source" -> select "Disk Image or VM File" -> Browse to image file -> click Next
+# Step 3: Enable all ingest modules (automated artifact analyzers) -> Click Finish
+# 
+# Post-Ingestion Navigation Arrays:
+# - Data Sources -> Expand target image file node -> Browse directory structures manually
+# - Extracted Content -> Web History -> Audit historical browser sessions and timelines
+# - Extracted Content -> Recent Documents -> Isolate user access events preceding the snapshot
+# - Views -> Deleted Files -> Identify target fragments marked with filesystem deletion flags
+# 
+# Platform: Autopsy GUI Analysis Engine
