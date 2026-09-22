@@ -1,0 +1,31 @@
+========================================================================
+FORENSIC ANALYSIS REPORT — DAY 5
+Date: September 22, 2026
+========================================================================
+
+🔒 SECTION 1: EVIDENCE INGESTION AND CRYPTOGRAPHIC VERIFICATION
+------------------------------------------------------------------------
+- WHAT I DID:
+  Created an active forensic workspace inside Autopsy ('Week-02-Practice-Investigation') 
+  and ingested a raw corporate-baseline disk image sourced from the NIST CFReDS repository.
+
+- WHAT I FOUND:
+  Successfully verified the cryptographic integrity of the source evidence file.
+  - Image Target: 2020JimmyWilson.E01 (891.29 MB)
+  - Verified MD5 Hash: b267fb0cd94645425eee00258d3a9b58
+  - Verified SHA-1 Hash: a1102c70a50768b588225fdcad6efa5d5d57341b
+  - Initial Ingest Metrics: Discovered 5 active user partitions, 376.91 MB of unallocated space, and 136 historical web browser artifacts.
+
+- WHAT I LEARNED:
+  I learned that digital forensics mandates absolute data preservation. Investigators 
+  never work on live files; they compute a cryptographic hash of a disk image immediately 
+  upon ingestion. If a single bit of data changes during analysis, the hashes will mismatch, 
+  rendering the evidence completely inadmissible in a court of law or internal corporate audit.
+
+- WHAT IT MEANS IN REAL LIFE:
+  When an organisation experiences an insider threat incident or an active breach, 
+  incident responders pull a raw physical copy of the hard drive. By capturing the cryptographic 
+  fingerprint (hash value) and analyzing it inside a protected sandbox like Autopsy, they can 
+  uncover deleted attacker timelines, exfiltrated files, and wiped browser histories while fully 
+  protecting the chain of custody.
+========================================================================
