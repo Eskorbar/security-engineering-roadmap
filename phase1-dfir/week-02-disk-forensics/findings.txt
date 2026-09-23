@@ -29,3 +29,60 @@ Date: September 22, 2026
   uncover deleted attacker timelines, exfiltrated files, and wiped browser histories while fully 
   protecting the chain of custody.
 ========================================================================
+
+
+====================================================================
+                        INVESTIGATION FINDINGS REPORT
+====================================================================
+Case Identifier:    Week-02-Practice-Investigation
+Lead Analyst:       Victor Nkereuwem (Eskor)
+Date of Analysis:   Sep 23, 2026
+Target System/Host: Local Workstation & Disk Image
+
+--------------------------------------------------------------------
+1. AUTOPSY ARTEFACT EXTRACTION & DISK FORENSICS
+--------------------------------------------------------------------
+
+A. BROWSER HISTORY LOGS
+[Entry 1]
+- URL:          https://www.google.com/search?q=potato+chips&source=lnms&tbm=isch&sa=X&ei=kyb6UvabEeXp2QWItIHwBQ&sqi=2&ved=0CAcQ_AUoAQ&biw=1024&bih=665#q=handguns&tbm=isch handguns - Google Search moc.elgoog.www. 1 0 0 6 100 1392125722054000 LnWmWlzGiEJu
+- Timestamp:    2014-02-11 14:36:12 WAT
+- Browser:      bing.com
+- Significance: User accessed a website about handguns
+
+[Entry 2]
+- URL:          http://www.bing.com/search?q=how+to+steal+identities&qs=n&form=QBRE&pq=how+to+steal+identities&sc=1-23&sp=-1&sk=&cvid=199c7210c92546888ad68d46ea00ff69 how to steal identities - Bing moc.gnib.www. 1 0 0 7 100 1392125932977000 pLAcmSNGL5Iq
+- Timestamp:    2014-02-11 14:38:52 WAT
+- Browser:      bing.com
+- Significance: The user acessed a website on how to steal idenities
+
+[Entry 3]
+- URL:          http://www.bing.com/search?q=identity+theft+jail+time&qs=n&form=QBRE&pq=identity+theft+jail+time&sc=1-24&sp=-1&sk=&ghc=1&cvid=c111b2ad073748a0a078c8844e65bb90 identity theft jail time - Bing moc.gnib.www. 1 0 0 7 100 1392126150301000 gxYTIN1ah6Kv
+- Timestamp:    2014-02-11 14:42:30 WAT
+- Browser:      bing.com
+- Significance: User accessed a website to knw the jail time for identity theft
+
+
+
+B. DELETED FILES RECOVERED
+- File Name:      ID Card Print
+- Original Path:  /img_SYSTEM.vhd/vol_vol8/ID Card Print
+- Deletion Date:  2014-01-08 08:01:50 WAT
+- Significance:   File was deleted shortly after creation; indicates potential cleanup attempt.
+
+C. RECENT DOCUMENTS ACCESS
+- Document Name:  name that need addresses.xls
+- Last Accessed:  2015-05-26 13:46:12 WAT
+- Context:        NILL
+
+D. INSTALLED PROGRAMS AUDIT
+- Application:    TrueCrypt v.7.1a	
+- Installation:   2014-02-03 12:54:43 WAT	
+- Assessment:     Potential envidence encryption by user
+
+E. 5-BULLET EXECUTIVE SUMMARY
+1. Forensic integrity verified; SHA-256 hash match confirmed on disk image.
+2. Web history demonstrates intentional access to identity theft and ID card printing
+3. User accessed sesnitive file name that need addresses.xls shortly before staging archive creation.
+4. Recovered deleted file ID Card Print from path /img_SYSTEM.vhd/vol_vol8/ID Card Print, establishing intent to remove evidence.
+5. Installed software audit revealed TrueCrypt on host system.

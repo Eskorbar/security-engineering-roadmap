@@ -1,0 +1,11 @@
+====================================================================
+                CHAIN OF CUSTODY & EVIDENCE LOG
+====================================================================
+Case Name:         Week-02-Practice-Investigation
+Analyst:           Victor Nkereuwem (Eskor)
+Date Loaded:       Sep 23, 2026
+Image Filename:    2020JimmyWilson.E01 (891.29 MB)
+Verified MD5 Hash: b267fb0cd94645425eee00258d3a9b58
+SHA-256 Hash:      a1102c70a50768b588225fdcad6efa5d5d57341b
+Hash Verification: PASSED (Match confirmed against initial acquisition)
+====================================================================
