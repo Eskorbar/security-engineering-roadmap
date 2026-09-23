@@ -32,7 +32,7 @@ Date: September 22, 2026
 
 
 ====================================================================
-                        INVESTIGATION FINDINGS REPORT
+                        INVESTIGATION FINDINGS REPORT  — DAY 7
 ====================================================================
 Case Identifier:    Week-02-Practice-Investigation
 Lead Analyst:       Victor Nkereuwem (Eskor)
