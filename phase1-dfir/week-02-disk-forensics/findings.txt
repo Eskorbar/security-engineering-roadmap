@@ -63,7 +63,6 @@ A. BROWSER HISTORY LOGS
 - Significance: User accessed a website to knw the jail time for identity theft
 
 
-
 B. DELETED FILES RECOVERED
 - File Name:      ID Card Print
 - Original Path:  /img_SYSTEM.vhd/vol_vol8/ID Card Print
@@ -86,3 +85,27 @@ E. 5-BULLET EXECUTIVE SUMMARY
 3. User accessed sesnitive file name that need addresses.xls shortly before staging archive creation.
 4. Recovered deleted file ID Card Print from path /img_SYSTEM.vhd/vol_vol8/ID Card Print, establishing intent to remove evidence.
 5. Installed software audit revealed TrueCrypt on host system.
+
+WIRESHARK NETWORK TRAFFIC CAPTURE
+--------------------------------------------------------------------
+- Active Interface:  Wifi 2 Interface
+- Capture Duration:  ~20 minutes
+- Display Filters:   http, dns, tcp, ip.addr == 8.8.8.8
+
+Findings:
+- Unsolicited Queries: Host issued automatic queries to dns64.dns.google,
+- Traffic Assessment: Plaintext HTTP reveals unencrypted headers; DNS queries expose full host domain resolution history across the local network segment.
+
+--------------------------------------------------------------------
+3. NMAP LOCALHOST PORT AUDIT
+--------------------------------------------------------------------
+Scan Command Executed: nmap -sV localhost
+
+Open Ports & Active Services:
+- Port 135/tcp   | State: Open | Service: msrpc
+- Port 445/tcp   | State: Open | Service: microsoft-ds?
+- Port 16992/tcp | State: Open | Service: amt-soap-http?
+
+Security Recommendations:
+- Hardening Strategy: Close or disable unused services (e.g., RDP on Port 3389).
+- Network Control: Restrict access to open administrative ports (e.g., SSH on Port 22) using host firewall rules.
