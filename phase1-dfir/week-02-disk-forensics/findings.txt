@@ -109,3 +109,111 @@ Open Ports & Active Services:
 Security Recommendations:
 - Hardening Strategy: Close or disable unused services (e.g., RDP on Port 3389).
 - Network Control: Restrict access to open administrative ports (e.g., SSH on Port 22) using host firewall rules.
+
+
+========================================================================
+Wireshark PCAP + Brute Force Awareness + Nmap
+Date: September 24, 2026
+========================================================================
+
+🔒 SECTION 1: WIRESHARK PCAP ANALYSIS
+------------------------------------------------------------------------
+I downloaded telnet-raw.pcap from  https://wiki.wireshark.org/uploads/__moin_import__/attachments/SampleCaptures/telnet-raw.pcap
+Opened the pcap via wireshark -> statistics -> conversations
+
+- WHAT I DID:
+  Downloaded and analyzed a practice packet capture file (telnet-raw.pcap) inside 
+  Wireshark, filtering for TCP Port 23 traffic to reconstruct an interactive, 
+  unencrypted terminal session from initial handshake to disconnect.
+
+- WHAT I FOUND:
+  Successfully dissected the raw TCP stream and reconstructed the network layer data.
+  - Connection Metrics: Communication occurred strictly between Port 23 (Telnet server) and Port 1254 (ephemeral client port) via a standard three-way SYN/ACK handshake.
+  - Infrastructure Grabbing: The remote system leaked its precise operating system banner: OpenBSD/i386 running on an older 32-bit architecture with the hostname 'oof'.
+  - Credential Harvesting: De-duplicated interlaced Telnet Echo characters to expose plain text login credentials. Username: 'fake' | Password: 'user11s'.
+  - Post-Auth Command Execution: Tracked the authenticated user's command history, revealing an active shell prompt ('$') used to run an external network utility command ('ping ://yahoo.com') followed by 'exit'.
+  - Top Conversions (IPs): 192.168.0.1 and 192.168.0.2
+  - Protocols Identified: TCP and telnet
+  - Attack Footprint: Lack of encryption (Telnet) allows full credential harvesting and session hijacking via sniffing.
+
+- WHAT I LEARNED:
+  I learned that legacy text-based protocols like Telnet stream keyboard data character-by-character 
+  in absolute cleartext over the wire, sending single-byte packets for every individual keystroke. 
+  The complete lack of cryptographic protection means that standard line terminators (\r\n) and 
+  sensitive operational credentials can be effortlessly intercepted and read by anyone with a basic 
+  packet sniffer on the path.
+
+- WHAT IT MEANS IN REAL LIFE:
+  When an organisation continues to use unencrypted management protocols, they leave their entire 
+  infrastructure exposed to total compromise via passive sniffing. An attacker sitting on the network 
+  can map out system versions, steal administrative passwords without running aggressive scans, and hijack 
+  active sessions. Security posture dictates that Telnet (Port 23) must be entirely deprecated and 
+  replaced with SSH (Port 22) to enforce data-in-transit encryption.
+
+
+
+
+🔒 SECTION 2: BRUTE FORCE ATTACK PROFILE
+------------------------------------------------------------------------
+- Target Account/Username: root
+- Tool used: likely Hydra or Medusa (automated SSH brute forcers)
+- Pattern: high volume, sequential usernames, automated timing
+- Total Failed Attempts / Time Window: 351
+- Threat Vector: Automated tools (e.g., Hydra, Medusa) utilizing rapid, high-volume credential stuffing.
+- Detection Profile: Sudden spikes in auth.log containing "Failed password for 80" from a single IP.
+- Detection method: sort | uniq -c | sort -rn showed the spike instantly
+- Defensive Controls: Implement Fail2Ban (rate-limiting/IP banning) and enforce public-key authentication (disable password auth).
+
+ WHAT I DID:
+  Analyzed historical Linux system logs (auth.log) from Day 3 to map a real-world, high-volume 
+  authentication attack. Researched the operational mechanics of the automated network logon cracker 
+  Hydra (://github.com) to document its specific structural footprints and 
+  establish robust log-based detection strategies.
+
+- WHAT I FOUND:
+  Identified a distinct, automated brute-force attack signature targeted against system services.
+  - Attack Tool Profile: The attack pattern reflects automated tools like Hydra or Medusa, which open multi-threaded parallel connections to rapidly iterate through wordlists.
+  - Volumetric Signature: The log analysis showed a massive spike in "Failed password for..." entries originating from a single source IP address, occurring within an impossibly tight, automated time window.
+  - Target Selection: The automated tool targeted sequential, generic usernames (such as 'root' or 'admin') or repeatedly stuffed passwords against a single vulnerable profile.
+  - Command-Line Forensic Detection: Used the following text-parsing pipeline to instantly isolate the adversary's footprint:
+    grep "Failed password" /var/log/auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn
+
+- WHAT I LEARNED:
+  I learned that automated brute-force tools like Hydra do not simulate human behaviour; they optimize for speed. 
+  They execute parallel authentication routines that create an undeniable statistical anomaly in system 
+  logs. Identifying these attacks relies on recognizing structural patterns—such as dozens of login failures 
+  occurring within the exact same millisecond block—rather than manually reading individual entry strings.
+
+- WHAT IT MEANS IN REAL LIFE:
+  In a corporate environment, unmonitored authentication endpoints are constantly targeted by background 
+  internet noise and targeted dictionary attacks. Defenders must implement automated log-parsing daemons 
+  like Fail2Ban to dynamically block offending IP addresses after a specified threshold of failures. 
+  Ultimately, the most definitive defense against network brute-forcing is to disable password authentication entirely and enforce public-key (SSH) cryptography.
+
+
+🔒 SECTION 3: NMAP DEEPER SCAN FINDINGS
+------------------------------------------------------------------------
+
+- WHAT I DID:
+  Executed advanced network enumeration scans against the local loopback adapter (localhost) 
+  using Nmap via the Zenmap GUI. Focused on service version detection using 'nmap -sV -O localhost', 
+  port restrictions via 'nmap -p 1-1000 localhost', and comprehensive aggressive script evaluation 
+  using 'nmap -A localhost'.
+
+- WHAT I FOUND:
+  Analyzed the differences between a basic ping sweep and interactive service scans:
+  - Service Banner Identification (nmap -sV -O localhost): The basic scan only shows if a port is 'open'. The -sV flag forced a protocol handshake, exposing the exact application name, service type, and firmware version running behind the port. The -O flag leveraged TCP/IP stack fingerprinting (analyzing TTL and window sizes) to map and guess the underlying kernel version.
+  - Port Range Limitation (nmap -p 1-1000 localhost): Constrained the enumeration footprint efficiently across the primary well-known ports (1-1000) to optimize scan times and focus on high-value targets.
+  - Aggressive Auditing (nmap -A localhost): Combined traceroute, OS detection, service version tracking, and NSE (Nmap Scripting Engine) default scripts to produce a comprehensive attack-surface footprint.
+
+- WHAT I LEARNED:
+  I learned that a simple port scan only maps out the doors of a burning building, whereas version detection 
+  (-sV) and aggressive scanning (-A) tell you exactly what kind of lock is on the door. It forces target 
+  services to respond to specific queries, revealing minor system variations that completely give away their 
+  software versions.
+
+- WHAT IT MEANS IN REAL LIFE:
+  In a target reconnaissance phase, a threat actor will never rely on standard port list assumptions (e.g., assuming 
+  Port 80 is always basic Apache). They use service version detection to cross-reference exact version strings 
+  against public CVE vulnerability databases. If an administrator leaves an unpatched or legacy service running, 
+  an attacker using Nmap can pinpoint the exact exploit script required to achieve Remote Code Execution (RCE).
