@@ -99,7 +99,10 @@ Findings:
 --------------------------------------------------------------------
 3. NMAP LOCALHOST PORT AUDIT
 --------------------------------------------------------------------
-Scan Command Executed: nmap -sV localhost
+Scan Command Executed:
+  nmap localhost
+  nmap -sV localhost    (detect service versions on open ports)
+  nmap -p 80,443,22,3389 localhost   (check specific ports)
 
 Open Ports & Active Services:
 - Port 135/tcp   | State: Open | Service: msrpc
@@ -112,7 +115,7 @@ Security Recommendations:
 
 
 ========================================================================
-Wireshark PCAP + Brute Force Awareness + Nmap
+Wireshark PCAP + Brute Force Awareness + Nmap - Day 8
 Date: September 24, 2026
 ========================================================================
 
@@ -217,3 +220,172 @@ Opened the pcap via wireshark -> statistics -> conversations
   Port 80 is always basic Apache). They use service version detection to cross-reference exact version strings 
   against public CVE vulnerability databases. If an administrator leaves an unpatched or legacy service running, 
   an attacker using Nmap can pinpoint the exact exploit script required to achieve Remote Code Execution (RCE).
+
+
+
+================================================================================
+DAY 9 DEEP FORENSICS & ANALYSIS
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. AUTOPSY DEEP DISCOVERY & ARTEFACT EXTRACTION
+-------------------------------------------------------------------------------
+- OS ACCOUNTS IDENTIFIED:
+  OS ACCOUNTS ANALYSIS:
+- Active Users: 3 Domain accounts (billybob, sgt, jimmy wilson) and 1 Local account (RID 1000).
+- Key Subject: "jimmy wilson" (Domain user, SID S-1-5-21-1171287513-3642516788-2358256967-1004).
+- System Architecture: The machine is joined to an Active Directory domain (Domain SID S-1-5-21-1171287513-3642516788-2358256967).
+
+  What is a SID (Security Identifier)?
+    A SID is a unique, variable-length string used by Windows to identify a user account, group, or computer.
+    Windows uses the SID internally in Access Control Lists (ACLs) to manage permissions rather than relying on usernames.
+    
+  Anatomy of a typical SID:
+  S-1-5-21-1171287513-3642516788-2358256967-1004
+
+    S — Identifies the string as a SID.
+    1 — Revision level (always 1).
+    5 — Identifier Authority (NT Authority).
+    21-1171287513-3642516788-2358256967 — Domain or Local Machine Identifier (shared by all accounts belonging to this computer or Active Directory domain).
+    1004 — The RID (Relative Identifier).
+
+- USB ATTACHED ARTEFACTS:
+  USB DEVICE ATTACHED ARTEFACTS:
+- 3 External Storage Devices identified in SYSTEM registry hive:
+    * Lexar Jumpdrive Secure 64MB (Serial: I145291811100) - First Connected: 2014-02-03 16:20:47 WAT
+    * SanDisk Card Reader (Serial: 0301936251) - First Connected: 2014-02-11 15:42:26 WAT
+    * Kingston DataTraveler 100 (Serial: 0019E001EA2D5A891A040057) - First Connected: 2014-02-20 20:11:06 WAT
+- Real-World Meaning: Proves physical connection of external media. High relevance for data exfiltration analysis; serial numbers provide chain-of-custody links to physical evidence.
+
+- KEYWORD SEARCH & TIMELINE SPIKES:
+  * Keyword 'password': Matched unallocated cluster containing plaintext credentials.
+  * Timeline Analysis: Activity spike noted between 19:15 UTC and 19:40 UTC (150+ file modifications/deletions).
+
+- ARTEFACT RECOVERY SUMMARY:
+  1. Browser History: 
+    Search Queries Executed
+      Identity Theft & Crimes:
+        Bing Search: "how to steal identities" (2014-02-11 14:38:52 WAT)
+        Bing Search: "identity theft jail time" (2014-02-11 14:42:30 WAT)
+        Yahoo Search: "ID Theft" (2014-02-10 15:07:57 WAT / 15:18:21 WAT)
+
+      Evasion & Hiding:
+        Bing Search: "how to disappear without a trace" (2014-02-10 15:18:35 WAT)
+        Bing Search: "fast getawy cars" (2014-02-10 15:12:27 WAT)
+
+      Weapons & Products:
+        Google Search: "potato chips" (2014-02-11 14:33:08 WAT)
+        Google Image Search: "handguns" (2014-02-11 14:35:22 WAT)
+        Bing Image / Video / Search: "handguns" (2014-02-11 14:36:12 WAT – 14:37:26 WAT)
+
+      Websites & Articles Visited
+        Identity Theft Resources:
+          [http://lifehacker.com/5900782/how-thieves-steal-your-identity-and-how-you-can-protect-yourself](http://lifehacker.com/5900782/how-thieves-steal-your-identity-and-how-you-can-protect-yourself) (2014-02-11 14:40:11 WAT)
+          [http://www.idtheftcenter.org/](http://www.idtheftcenter.org/) (2014-02-10 15:06:12 WAT)
+          [http://www.justice.gov/criminal/fraud/websites/idtheft.html](http://www.justice.gov/criminal/fraud/websites/idtheft.html) (2014-02-10 15:09:37 WAT)
+
+        Disappearing & Privacy Guides:
+          [http://lifehacker.com/5676149/how-to-ditch-big-brother-and-disappear-forever](http://lifehacker.com/5676149/how-to-ditch-big-brother-and-disappear-forever) (2014-02-10 15:18:21 WAT)
+          [http://hereandnow.wbur.org/2010/12/03/frank-ahearn-privacy](http://hereandnow.wbur.org/2010/12/03/frank-ahearn-privacy) ("Private Investigator Explains How To ‘Vanish Without A Trace’") (2014-02-10 15:18:04 WAT)
+          [http://www.ehow.com/how_2145471_disappear-forever.html](http://www.ehow.com/how_2145471_disappear-forever.html) (2014-02-10 15:15:38 WAT)
+          [http://www.vagabondish.com/how-to-disappear-in-america/](http://www.vagabondish.com/how-to-disappear-in-america/) (2014-02-10 15:18:29 WAT)
+          [http://libertarianmoney.wordpress.com/2013/05/29/how-to-hide-money-from-the-government/](http://libertarianmoney.wordpress.com/2013/05/29/how-to-hide-money-from-the-government/) (2014-02-10 15:24:04 WAT)
+
+        ID Card Printers / Hardware:
+          [http://www.zebra.com/.../card/zxp-series-8.html](http://www.zebra.com/.../card/zxp-series-8.html) (Zebra ZXP Series 8 Card Printer) (2014-02-10 14:57:01 WAT)
+          [http://www.barcodesinc.com/cats/id-card-printers/](http://www.barcodesinc.com/cats/id-card-printers/) (2014-02-10 15:03:09 WAT)
+
+    Local File Access (file:///)
+      PDFs & Documents:
+        file:///C:/Users/Jimmy%20Wilson/Documents/zxp8-datasheet-en-us.pdf (2014-02-10 15:00:03 WAT)
+        file:///C:/Users/Jimmy%20Wilson/Documents/name%20that%20need%20addresses.xls (2014-02-19 13:37:01 WAT)
+        file:///C:/Users/Jimmy%20Wilson/Documents/To%20Whom%20it%20may%20concern.doc (2014-02-19 13:49:21 WAT)
+
+      Price Lists:
+        file:///C:/Users/Jimmy%20Wilson/Desktop/New%20Prices/NewPrices.txt (2014-02-16 20:39:40 WAT)
+        file:///C:/Users/Jimmy%20Wilson/Desktop/New%20Prices/New%20Price%20List.txt (2014-02-16 20:43:38 WAT)
+        file:///C:/Users/Jimmy%20Wilson/Desktop/New%20Prices/New%20Price%20List%20Encoded.TXT (2014-02-16 20:53:55 WAT)
+
+  2. Deleted Files:
+    - User Target: Jimmy Wilson (AppData/Local/ & AppData/Roaming/)
+    - Web Cache Artifacts: Extracted deleted IE5 cache images, scripts (.js), and low-integrity web cookies from 'Temporary Internet Files'.
+    - Registry Transaction Logs (2015-05-26 13:52:41 WAT):
+      * Active transaction logs present for SAM.LOG1, SECURITY.LOG1, SOFTWARE.LOG1, SYSTEM.LOG1, DEFAULT.LOG1, and COMPONENTS.
+    - System Event Logs (2015-05-26 13:57:51 WAT):
+      * Microsoft-Windows-Winlogon%4Operational.evtx created at 13:57:27 WAT and modified at 13:57:51 WAT.
+    - Assembly Artifacts ($OrphanFiles): Identified orphaned .NET assemblies (System.Web, System.Printing, System.Transactions, ComSvcConfig) unlinked in unallocated space.
+
+  3. Recent Documents:
+    - User Context: Jimmy Wilson (C:\Users\Jimmy Wilson\)
+    - Incident Window: 2015-05-26 13:45:54 to 13:46:16 WAT
+    - Rapid Document Sequence:
+      1. Opened 'name that need addresses.xls' at 13:46:12 WAT
+      2. Opened 'NewPrices.txt' at 13:46:13 WAT
+      3. Opened 'New Price List.txt' at 13:46:15 WAT
+      4. Opened 'New Price List Encoded.TXT' at 13:46:16 WAT
+
+    - Administrative Tooling Execution (NTUSER.DAT MRU):
+      * Ran Task Scheduler (taskschd.msc) and Computer Management (compmgmt.msc).
+
+    - Real-World Meaning: LNK artifacts prove file interaction.
+      The 3-second rapid access to 'New Price List Encoded.TXT' indicates file manipulation/encoding,
+      while taskschd.msc execution points to potential persistence setup.
+    
+  4. Installed Programs:
+    - Target Account: wilsonjimmy807@gmail.com
+    - Primary External Contacts:
+        1. robert.ripoff@gmx.com (12 email files identified)
+        2. jose.badguy@hushmail.com (11 email files identified - privacy/encrypted service)
+    - System Notifications:
+        1. mail-noreply@google.com (3 email files)
+        2. noreply-daa26fef@plus.google.com (1 email file)
+    - Total EML Files Parsed: 27
+  
+  5. Email Messages:
+    - Target Account: wilsonjimmy807@gmail.com
+    - Primary External Contacts:
+      1. robert.ripoff@gmx.com (12 email files identified)
+      2. jose.badguy@hushmail.com (11 email files identified - privacy/encrypted service)
+    - System Notifications:
+      1. mail-noreply@google.com (3 email files)
+      2. noreply-daa26fef@plus.google.com (1 email file)
+    - Total EML Files Parsed: 27
+
+-------------------------------------------------------------------------------
+2. WIRESHARK ATTACK PCAP ANALYSIS (DAY 8)
+-------------------------------------------------------------------------------
+- TOP TALKERS (CONVERSATIONS):
+  * Internal IP: 192.168.1.105 <---> External IP: 185.220.101.5 (Port 443)
+- ATTACK INDICATORS IDENTIFIED:
+  * Port Scan Flag: High volume of TCP SYN packets (tcp.flags.syn==1) targeting ports 22, 80, 443, 3389.
+  * HTTP POST Exfiltration: `http.request.method == "POST"` sending encrypted payloads to external IP.
+  * IOCs: External IP 185.220.101.5, Domain C2 `evil-gateway.ru`.
+
+-------------------------------------------------------------------------------
+3. HASHCAT & PASSWORD ANALYSIS (DAY 9)
+-------------------------------------------------------------------------------
+- HASH CONCEPTS & DICTIONARY ATTACKS:
+  * Hashes are one-way cryptographic digests. Passwords are stored as hashes to prevent direct leaks.
+  * Dictionary attacks compute hashes of known words (e.g., rockyou.txt) to find matches instantly.
+  * Strong password policies require length (14+ chars) and high entropy to widen search space beyond dictionary bounds.
+
+- DEFENSIVE USE:
+  * Forensics: Extracting SAM/NTDS.dit hashes to determine exposure scope.
+  * Defense: Auditing Active Directory databases for weak, crackable passwords using Hashcat.
+
+-------------------------------------------------------------------------------
+4. AUTH.LOG REINFORCEMENT & PIVOT STRATEGY (DAY 9)
+-------------------------------------------------------------------------------
+- LOG ANALYSIS RESULT:
+  * Command: `grep 'Accepted password' auth.log`
+  * Status: [Accepted / No Accepted logins found]
+
+- FAILED VS SUCCESSFUL BRUTE FORCE:
+  * Failed: Repeated 'Failed password' lines without a subsequent session initialization.
+  * Successful: 'Accepted password' entry followed by 'pam_unix(sshd:session): session opened'.
+
+- PIVOT STRATEGY ON COMPROMISE:
+  If login succeeds, pivot immediately to:
+  1. Audit session commands via `bash_history` or auditd.
+  2. Map lateral movement via secondary network connections from the user context.
+  3. Inspect persistence mechanisms (cron jobs, systemd services, SSH authorized_keys).
