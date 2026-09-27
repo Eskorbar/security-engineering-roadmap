@@ -8,4 +8,59 @@ Image Filename:    2020JimmyWilson.E01 (891.29 MB)
 Verified MD5 Hash: b267fb0cd94645425eee00258d3a9b58
 SHA-256 Hash:      a1102c70a50768b588225fdcad6efa5d5d57341b
 Hash Verification: PASSED (Match confirmed against initial acquisition)
-====================================================================
+
+
+===============================================================================
+EXTRACTED OS ACCOUNTS LOG
+===============================================================================
+1. Local Admin Account  | SID: S-1-5-21-67086987-2446681470-237959220-1000    | Scope: Local
+2. User: billybob       | SID: S-1-5-21-1171287513-3642516788-2358256967-1001 | Scope: Domain
+3. User: sgt            | SID: S-1-5-21-1171287513-3642516788-2358256967-1003 | Scope: Domain
+4. User: jimmy wilson   | SID: S-1-5-21-1171287513-3642516788-2358256967-1004 | Scope: Domain
+
+
+===============================================================================
+EXTRACTED RECENT DOCUMENTS / LNK LOG
+===============================================================================
+LNK: New Price List Encoded.lnk | Path: C:\Users\Jimmy Wilson\Desktop\New Prices\New Price List Encoded.TXT | Date: 2015-05-26 13:46:16 WAT
+LNK: New Price List.lnk         | Path: C:\Users\Jimmy Wilson\Desktop\New Prices\New Price List.txt         | Date: 2015-05-26 13:46:15 WAT
+LNK: NewPrices.lnk              | Path: C:\Users\Jimmy Wilson\Desktop\New Prices\NewPrices.txt              | Date: 2015-05-26 13:46:13 WAT
+MRU: taskschd.msc               | Hive: NTUSER.DAT (Task Scheduler execution)
+MRU: compmgmt.msc               | Hive: NTUSER.DAT (Computer Management execution)
+
+
+
+===============================================================================
+EXTRACTED KEYWORD SEARCH & SENSITIVE DATA LOG
+===============================================================================
+Keyword: "password"     | 158 Files with Hits | Primary Target: C:\Users\Jimmy Wilson\Documents\passwords.txt
+Keyword: "confidential" | 2104 Files with Hits | Unique Files: 31 | Primary Target: C:\Users\Jimmy Wilson\Documents\IDtheftrev.pdf
+===============================================================================
+
+
+===============================================================================
+EXTRACTED BROWSER HISTORY LOG
+===============================================================================
+Search  | Query: "how to steal identities"              | Browser: Internet Explorer | Timestamp: 2014-02-11 14:38:52 WAT
+Search  | Query: "how to disappear without a trace"     | Browser: Internet Explorer | Timestamp: 2014-02-10 15:18:35 WAT
+Search  | Query: "handguns"                             | Browser: Internet Explorer | Timestamp: 2014-02-11 14:35:22 WAT
+Website | URL: http://www.idtheftcenter.org/            | Browser: Internet Explorer | Timestamp: 2014-02-10 15:06:12 WAT
+Website | URL: http://www.zebra.com/card/zxp-series-8   | Browser: Internet Explorer | Timestamp: 2014-02-10 14:57:01 WAT
+
+
+===============================================================================
+EXTRACTED INSTALLED PROGRAMS LOG
+===============================================================================
+Program | Name: Zebra ZXP Series 8 Card Printer Drivers | Vendor: Zebra Technologies   | Function: Hardware Driver (ID Printing)
+Program | Name: KeePass Password Safe 2.24              | Vendor: Dominik Reichl       | Function: Password Management
+Program | Name: TrueCrypt 7.1a                          | Vendor: TrueCrypt Foundation | Function: Volume Encryption
+
+
+===============================================================================
+EXTRACTED COMMUNICATIONS / EMAIL LOG
+===============================================================================
+Email | Target: wilsonjimmy807@gmail.com | Sender: robert.ripoff@gmx.com     | Parsed Files: 12 EMLs | Topic: Operational Directives
+Email | Target: wilsonjimmy807@gmail.com | Sender: jose.badguy@hushmail.com  | Parsed Files: 11 EMLs | Topic: Encrypted Staging Instructions
+Email | Target: wilsonjimmy807@gmail.com | Sender: mail-noreply@google.com   | Parsed Files: 3 EMLs  | Topic: Account Alerts
+
+

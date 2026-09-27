@@ -119,6 +119,7 @@ Wireshark PCAP + Brute Force Awareness + Nmap - Day 8
 Date: September 24, 2026
 ========================================================================
 
+
 🔒 SECTION 1: WIRESHARK PCAP ANALYSIS
 ------------------------------------------------------------------------
 I downloaded telnet-raw.pcap from  https://wiki.wireshark.org/uploads/__moin_import__/attachments/SampleCaptures/telnet-raw.pcap
@@ -152,7 +153,6 @@ Opened the pcap via wireshark -> statistics -> conversations
   can map out system versions, steal administrative passwords without running aggressive scans, and hijack 
   active sessions. Security posture dictates that Telnet (Port 23) must be entirely deprecated and 
   replaced with SSH (Port 22) to enforce data-in-transit encryption.
-
 
 
 
@@ -194,6 +194,7 @@ Opened the pcap via wireshark -> statistics -> conversations
   Ultimately, the most definitive defense against network brute-forcing is to disable password authentication entirely and enforce public-key (SSH) cryptography.
 
 
+
 🔒 SECTION 3: NMAP DEEPER SCAN FINDINGS
 ------------------------------------------------------------------------
 
@@ -225,13 +226,24 @@ Opened the pcap via wireshark -> statistics -> conversations
 
 ================================================================================
 DAY 9 DEEP FORENSICS & ANALYSIS
+Date: September 25, 2026
 ===============================================================================
+• OS Account Audit & USB Registry Artifacts:
+  Identified 4 OS accounts (1 local administrator, 3 domain users). Registry analysis verified 3 distinct 
+  external USB mass storage devices connected directly to the target system (Lexar, SanDisk, and Kingston). 
+  Connection timestamps (including 2015-05-26 13:40:05 WAT) align directly with file manipulation windows, 
+  serving as primary physical evidence of data exfiltration.
+
+• Keyword Indexing & Timeline Analysis:
+  - Search for "password" exposed plaintext credentials stored in C:\Users\Jimmy Wilson\Documents\passwords.txt.txt.
+  - Search for "confidential" indexed staged data inside "New Price List Encoded.TXT".
+  - Timeline analysis revealed a major activity burst on 2015-05-26 between 13:40 WAT and 13:50 WAT, showing 
+    rapid creation, encoding, LNK file interaction, and subsequent deletion of sensitive documents.
 
 -------------------------------------------------------------------------------
 1. AUTOPSY DEEP DISCOVERY & ARTEFACT EXTRACTION
 -------------------------------------------------------------------------------
 - OS ACCOUNTS IDENTIFIED:
-  OS ACCOUNTS ANALYSIS:
 - Active Users: 3 Domain accounts (billybob, sgt, jimmy wilson) and 1 Local account (RID 1000).
 - Key Subject: "jimmy wilson" (Domain user, SID S-1-5-21-1171287513-3642516788-2358256967-1004).
 - System Architecture: The machine is joined to an Active Directory domain (Domain SID S-1-5-21-1171287513-3642516788-2358256967).
@@ -249,19 +261,19 @@ DAY 9 DEEP FORENSICS & ANALYSIS
     21-1171287513-3642516788-2358256967 — Domain or Local Machine Identifier (shared by all accounts belonging to this computer or Active Directory domain).
     1004 — The RID (Relative Identifier).
 
-- USB ATTACHED ARTEFACTS:
-  USB DEVICE ATTACHED ARTEFACTS:
-- 3 External Storage Devices identified in SYSTEM registry hive:
-    * Lexar Jumpdrive Secure 64MB (Serial: I145291811100) - First Connected: 2014-02-03 16:20:47 WAT
-    * SanDisk Card Reader (Serial: 0301936251) - First Connected: 2014-02-11 15:42:26 WAT
-    * Kingston DataTraveler 100 (Serial: 0019E001EA2D5A891A040057) - First Connected: 2014-02-20 20:11:06 WAT
-- Real-World Meaning: Proves physical connection of external media. High relevance for data exfiltration analysis; serial numbers provide chain-of-custody links to physical evidence.
+- USB DEVICE ATTACHED ARTEFACTS:
+  - 3 External Storage Devices identified in SYSTEM registry hive:
+      * Lexar Jumpdrive Secure 64MB (Serial: I145291811100) - First Connected: 2014-02-03 16:20:47 WAT
+      * SanDisk Card Reader (Serial: 0301936251) - First Connected: 2014-02-11 15:42:26 WAT
+      * Kingston DataTraveler 100 (Serial: 0019E001EA2D5A891A040057) - First Connected: 2014-02-20 20:11:06 WAT
+  - Real-World Meaning: Proves physical connection of external media. High relevance for data exfiltration analysis; serial numbers provide chain-of-custody links to physical evidence.
 
 - KEYWORD SEARCH & TIMELINE SPIKES:
-  * Keyword 'password': Matched unallocated cluster containing plaintext credentials.
-  * Timeline Analysis: Activity spike noted between 19:15 UTC and 19:40 UTC (150+ file modifications/deletions).
+  - Search for "password" exposed plaintext credentials stored in C:\Users\Jimmy Wilson\Documents\passwords.txt.txt.
+  - Search for "confidential" indexed staged data inside "New Price List Encoded.TXT".
+  - Timeline analysis revealed a major activity burst on 2015-05-26 between 13:40 WAT and 13:50 WAT, showing 
+    rapid creation, encoding, LNK file interaction, and subsequent deletion of sensitive documents.
 
-- ARTEFACT RECOVERY SUMMARY:
   1. Browser History: 
     Search Queries Executed
       Identity Theft & Crimes:
@@ -332,60 +344,16 @@ DAY 9 DEEP FORENSICS & ANALYSIS
       while taskschd.msc execution points to potential persistence setup.
     
   4. Installed Programs:
-    - Target Account: wilsonjimmy807@gmail.com
-    - Primary External Contacts:
-        1. robert.ripoff@gmx.com (12 email files identified)
-        2. jose.badguy@hushmail.com (11 email files identified - privacy/encrypted service)
-    - System Notifications:
-        1. mail-noreply@google.com (3 email files)
-        2. noreply-daa26fef@plus.google.com (1 email file)
-    - Total EML Files Parsed: 27
+    System registry listings confirm installation of Zebra ZXP Series 8 Card Printer Drivers, 
+    KeePass Password Safe 2.24, and TrueCrypt 7.1a.
+    Real-World Meaning: Confirms capabilities for identity card fabrication
+    and container encryption/password management on the suspect host.
   
   5. Email Messages:
-    - Target Account: wilsonjimmy807@gmail.com
-    - Primary External Contacts:
-      1. robert.ripoff@gmx.com (12 email files identified)
-      2. jose.badguy@hushmail.com (11 email files identified - privacy/encrypted service)
-    - System Notifications:
-      1. mail-noreply@google.com (3 email files)
-      2. noreply-daa26fef@plus.google.com (1 email file)
-    - Total EML Files Parsed: 27
+    Parsed 27 EML files from Windows Live Mail (wilsonjimmy807@gmail.com). Identified 12 direct exchanges 
+    with robert.ripoff@gmx.com and 11 exchanges with jose.badguy@hushmail.com containing instructions to 
+    "encode test file with the password we discussed earlier".
+    Real-World Meaning: Establishes active collusion, data staging,
+    and password sharing with external malicious actors via privacy-focused email providers.
 
--------------------------------------------------------------------------------
-2. WIRESHARK ATTACK PCAP ANALYSIS (DAY 8)
--------------------------------------------------------------------------------
-- TOP TALKERS (CONVERSATIONS):
-  * Internal IP: 192.168.1.105 <---> External IP: 185.220.101.5 (Port 443)
-- ATTACK INDICATORS IDENTIFIED:
-  * Port Scan Flag: High volume of TCP SYN packets (tcp.flags.syn==1) targeting ports 22, 80, 443, 3389.
-  * HTTP POST Exfiltration: `http.request.method == "POST"` sending encrypted payloads to external IP.
-  * IOCs: External IP 185.220.101.5, Domain C2 `evil-gateway.ru`.
 
--------------------------------------------------------------------------------
-3. HASHCAT & PASSWORD ANALYSIS (DAY 9)
--------------------------------------------------------------------------------
-- HASH CONCEPTS & DICTIONARY ATTACKS:
-  * Hashes are one-way cryptographic digests. Passwords are stored as hashes to prevent direct leaks.
-  * Dictionary attacks compute hashes of known words (e.g., rockyou.txt) to find matches instantly.
-  * Strong password policies require length (14+ chars) and high entropy to widen search space beyond dictionary bounds.
-
-- DEFENSIVE USE:
-  * Forensics: Extracting SAM/NTDS.dit hashes to determine exposure scope.
-  * Defense: Auditing Active Directory databases for weak, crackable passwords using Hashcat.
-
--------------------------------------------------------------------------------
-4. AUTH.LOG REINFORCEMENT & PIVOT STRATEGY (DAY 9)
--------------------------------------------------------------------------------
-- LOG ANALYSIS RESULT:
-  * Command: `grep 'Accepted password' auth.log`
-  * Status: [Accepted / No Accepted logins found]
-
-- FAILED VS SUCCESSFUL BRUTE FORCE:
-  * Failed: Repeated 'Failed password' lines without a subsequent session initialization.
-  * Successful: 'Accepted password' entry followed by 'pam_unix(sshd:session): session opened'.
-
-- PIVOT STRATEGY ON COMPROMISE:
-  If login succeeds, pivot immediately to:
-  1. Audit session commands via `bash_history` or auditd.
-  2. Map lateral movement via secondary network connections from the user context.
-  3. Inspect persistence mechanisms (cron jobs, systemd services, SSH authorized_keys).
