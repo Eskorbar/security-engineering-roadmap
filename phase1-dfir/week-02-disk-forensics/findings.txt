@@ -86,6 +86,7 @@ E. 5-BULLET EXECUTIVE SUMMARY
 4. Recovered deleted file ID Card Print from path /img_SYSTEM.vhd/vol_vol8/ID Card Print, establishing intent to remove evidence.
 5. Installed software audit revealed TrueCrypt on host system.
 
+--------------------------------------------------------------------
 WIRESHARK NETWORK TRAFFIC CAPTURE
 --------------------------------------------------------------------
 - Active Interface:  Wifi 2 Interface
@@ -357,3 +358,77 @@ Date: September 25, 2026
     and password sharing with external malicious actors via privacy-focused email providers.
 
 
+
+================================================================================
+DAY 10 and 11  - WIRESHARK ATTACK PCAP ANALYSIS, HASHCAT
+          AND  PASSWORD ANALYSIS AND LOG ANALYSIS REINFORCEMENT
+          Date: September 26 - 27, 2026
+===============================================================================
+1. ATTACK ACTIVITY SUMMARY
+-------------------------------------------------------------------------------
+• TOP TALKERS (CONVERSATIONS):
+  * Internal IP: 192.168.204.137 (Port 49193) <---> External IP: 185.220.101.5 (Port 80)
+--------------------------------------------------------------------------
+• Threat Activity Identified:
+  Multi-stage web exploit kit infection chain involving flash-based initial access,
+  obfuscated payload staging, and HTTP POST callback/exfiltration from internal 
+  host 192.168.204.137.
+
+• Detailed Infection Chain:
+  1. Initial Landing / Compromised Referer: The victim host interacted with 
+     a compromised landing page (imprintchurch.org) which delivered a malicious 
+     Flash file (/d6bc1dc7da4ed54a62b93b5d0f1cc40c.swf).
+  2. Staging & High-Volume Responses: The client established multiple HTTP GET 
+     streams (Streams 0, 3, 4, 5) with 167.160.46.121 using randomized, obfuscated 
+     URI paths to retrieve payload fragments, pulling down over 400 kB of traffic.
+  3. Domain Interactions: HTTP Host headers revealed active communication with 
+     malicious/redirect domains, including static.domainvertythephones.com.
+  4. Outbound C2 Callback / Exfiltration: Frame 33 captures a subsequent HTTP POST 
+     request sent to host akronkappas.com (69.65.9.55). The request body 
+     exfiltrates base64-encoded system parameters (`ip`, `ua`, `furl`).
+
+
+-------------------------------------------------------------------------------
+2. INDICATORS OF COMPROMISE (IOCs)
+-------------------------------------------------------------------------------
+• Victim Host IP:
+  - 192.168.204.137
+
+• Threat Actor / C2 / Staging IPs:
+  - 167.160.46.121 (Primary high-volume payload server)
+  - 69.65.9.55     (Command & Control / Callback server)
+  - 75.126.113.164 (Flash payload source)
+  - 94.199.178.119 (Secondary web endpoint)
+
+• Malicious Domains Identified:
+  - akronkappas.com
+  - static.domainvertythephones.com
+  - imprintchurch.org (Compromised site / Referer)
+
+• Extracted Malicious URI & Script Paths:
+  - /d2a42e1f7d9a1021bd7d93af414c9sc4.php
+  - /d6bc1dc7da4ed54a62b93b5d0f1cc40c.swf
+  - /xEztiZ7NM12Vj9c2RTB_MT0UEYH_re0UqLWZq_vBhBZGq0KGVP1BTVXxVeSy3Veo
+  - /ah9KedcNijtKbdju6QOisUuU1VEego9GoKnhBFi1Zvi2Z1s1BsHOE1aHnOKWMBB2
+  - /qxrwmriaPvb2cBLwxw1uR_EEnOuZR9mgVr3reB3-1yiVm9H15-VbU3vy1Dw4RGW3
+  - /RSBbr6XDxZwv-i2lhZFras66SJRIL5vez28iuddGQjo94jue4fGqpAN9QPAW_yPY
+  - /gSEUozajoHorzUcfwjgep5-0HOV5tn4pzQS8exfGPXFOBGBQwREcD1wKpJQk2T59
+
+• Full Exfiltration Request URI:
+  - http://akronkappas.com/d2a42e1f7d9a1021bd7d93af414c95c4.php?q=70a9b40eb73da114
+
+• Exfiltrated Form Data Parameters:
+  - ip   = 4wivDYZkyXfwpS1RQQ==
+  - ua   = tlP7Vt89hmr1vjdAW8YqmDT/sGFiyxROsPBX45R6HxinEeZC+YGrgEA0mmA3NDIJUYzgWm29EKShU2QPqxBXzQ5OIO1NfJGMPwbcal6bdsLOjhE6PxEqiVMLSlzkhwGL7waQC2MG3kV/8caj/fdOUfa+VdO9rM0WISe0rMU+iMr80Q==
+  - furl = s0j1T4l+yDa18XmJEIshmin/rw2ZWgMB6elM74EySFjyWehw/4Lg3F91jz8yJmcUVQ==
+
+
+-------------------------------------------------------------------------------
+3. NETWORK PROTOCOLS & PORTS USED
+-------------------------------------------------------------------------------
+• Layer 3 / 4 Transport Protocols: IPv4 / TCP
+• Layer 7 Application Protocols: HTTP Cleartext (GET / POST)
+• Destination Port: Port 80 (HTTP)
+• Client Source Ports Used: Dynamic Ephemeral Ports (49168, 49186, 49188, 49190, 49193, 49200)
+• Client User-Agent String: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)
+===============================================================================

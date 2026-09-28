@@ -1,0 +1,89 @@
+===============================================================================
+MY FORENSIC WIRESHARK DISPLAY FILTER CHEAT SHEET
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. HTTP & WEB TRAFFIC ANALYSIS (Used in Day 9 / Exploitation Analysis)
+-------------------------------------------------------------------------------
+• SEE OUTBOUND FILE DOWNLOADS / WEB VISITS
+  http.request.method == "GET"
+  Use: Shows when a victim visits web pages, loads scripts, or downloads payloads.
+
+• SEE DATA SUBMISSIONS & EXFILTRATION
+  http.request.method == "POST"
+  Use: Shows stolen data, credentials, and malware beacons being sent out.
+
+• FILTER FOR EXPLOIT & SUSPICIOUS FILE TYPES
+  http.request.uri contains ".swf" || http.request.uri contains ".exe" || http.request.uri contains ".php"
+  Use: Isolates dangerous downloads (Flash exploits, executables, dynamic PHP scripts).
+
+• ISOLATE TRAFFIC BY SPECIFIC HOST DOMAIN
+  http.host contains "akronkappas.com"
+  Use: Filters traffic going to or coming from a specific domain (IOC).
+
+• FIND HTTP RESPONSE ERRORS / SUCCESSES
+  http.response.code == 200    # Successful page/file delivery
+  http.response.code == 404    # File not found (common in web directory brute-forcing)
+
+
+-------------------------------------------------------------------------------
+2. DNS & DOMAIN INVESTIGATION
+-------------------------------------------------------------------------------
+• SEARCH FOR SPECIFIC TOP-LEVEL DOMAINS (.ru, .cn, etc.)
+  dns && dns.qry.name contains ".ru"
+  Use: Filters for DNS lookups targeting specific country-code or suspicious TLDs.
+
+• ALL OUTBOUND DNS LOOKUPS
+  dns.flags.response == 0
+  Use: Shows only DNS query requests coming from internal hosts.
+
+• FIND FAILED DNS LOOKUPS (Non-existent Domains)
+  dns.flags.rcode == 3
+  Use: Highlights potential DGA (Domain Generation Algorithm) malware traffic.
+
+
+-------------------------------------------------------------------------------
+3. TCP HANDSHAKES & NETWORK SCANNING
+-------------------------------------------------------------------------------
+• FIND NEW CONNECTION REQUESTS (SYN SCANNING)
+  tcp.flags.syn == 1 && tcp.flags.ack == 0
+  Use: Identifies initial connection setup requests. Spikes indicate port scanning.
+
+• FIND REJECTED / CLOSED CONNECTIONS (RST Packets)
+  tcp.flags.reset == 1
+  Use: Shows connections rejected by firewalls or closed ports during a scan.
+
+• ISOLATE NON-STANDARD PORT TRAFFIC
+  tcp.port == 8080 || tcp.port == 4444
+  Use: Filters for common malware/backdoor communication channels.
+
+
+-------------------------------------------------------------------------------
+4. ISOLATING HOSTS & NETWORK CONVERSATIONS
+-------------------------------------------------------------------------------
+• FILTER ALL TRAFFIC FROM YOUR VICTIM MACHINE
+  ip.src == 192.168.204.137
+  Use: Isolates all outbound traffic originating specifically from the infected host.
+
+• FILTER TRAFFIC BETWEEN SPECIFIC VICTIM & ATTACKER
+  ip.addr == 192.168.204.137 && ip.addr == 69.65.9.55
+  Use: Shows bidirectional conversation between the target host and C2 server.
+
+• EXCLUDE NOISE (e.g., Broadcasts, Local SSDP/MDNS)
+  !(arp || dns || dhcp || ssdp)
+  Use: Cleans up the packet window by hiding standard local network noise.
+
+
+-------------------------------------------------------------------------------
+5. PAYLOAD SEARCHES & CONTENT MATCHING
+-------------------------------------------------------------------------------
+• SEARCH PACKETS FOR TEXT STRINGS (e.g., passwords, keys, file names)
+  frame contains "password"
+  frame contains "New Price List"
+  frame contains "Base64"
+  Use: Case-insensitive search through packet bodies for key text indicators.
+
+• SEARCH FOR ENCODED POST DATA PARAMETERS
+  http.file_data contains "ip=" || http.file_data contains "ua="
+  Use: Isolates POST body data containing stolen system profile info.
+===============================================================================
