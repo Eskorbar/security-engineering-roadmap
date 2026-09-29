@@ -56,10 +56,34 @@ touch phase1-dfir/week-02-disk-forensics/evidence-log.txt
     # port restrictions via 'nmap -p 1-1000 localhost'
     # and comprehensive aggressive script evaluation using 'nmap -A localhost'.
 #------------------------------------------------------------------------------
-#----- Day 10 Wireshark & PCAP Analysis Helpers ----
+#----- Day 10: Wireshark & PCAP Analysis Helpers ----
 #------------------------------------------------------------------------------
 # Filter references used in Wireshark:
     # tcp.flags.syn == 1 && tcp.flags.ack == 0
     # http.request.method == "POST"
     # dns && dns.qry.name contains ".ru"
 
+
+# =====================================================================
+# DAY 11: Hashcat Setup & Execution
+# =====================================================================
+# Update and install hashcat
+sudo apt update && sudo apt install hashcat -y
+
+# Download rockyou wordlist
+wget https://github.com/brannondorsey/naive-hashcat/releases/download/v1.0/rockyou.txt
+
+# Generate test MD5 hash for string "hello"
+echo -n "hello" | md5sum | awk '{print $1}' > hash.txt
+
+# Crack hash with Hashcat using mode 0 (MD5)
+hashcat -m 0 hash.txt rockyou.txt
+
+# Display cracked hash from potfile
+hashcat -m 0 hash.txt rockyou.txt --show
+
+# ----------------------------------------------------------
+# --- Auth Log Analysis ---
+# ---------------------------------------------------------
+# Check auth.log for successful password authentications
+grep 'Accepted password' auth.log

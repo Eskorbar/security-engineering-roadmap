@@ -360,8 +360,7 @@ Date: September 25, 2026
 
 
 ================================================================================
-DAY 10 and 11  - WIRESHARK ATTACK PCAP ANALYSIS, HASHCAT
-          AND  PASSWORD ANALYSIS AND LOG ANALYSIS REINFORCEMENT
+DAY 10 - WIRESHARK ATTACK PCAP ANALYSIS
           Date: September 26 - 27, 2026
 ===============================================================================
 1. ATTACK ACTIVITY SUMMARY
@@ -432,3 +431,77 @@ DAY 10 and 11  - WIRESHARK ATTACK PCAP ANALYSIS, HASHCAT
 • Client Source Ports Used: Dynamic Ephemeral Ports (49168, 49186, 49188, 49190, 49193, 49200)
 • Client User-Agent String: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)
 ===============================================================================
+
+
+================================================================================
+Day 11: PASSWORD HASH ANALYSIS, HASHCAT AUDITING AND LOG ANALYSIS REINFORCEMENT
+        Date: September 28, 2026
+================================================================================
+
+1. WHAT IS A HASH & WHY PASSWORDS ARE STORED THIS WAY:
+   • A cryptographic hash is a one-way mathematical function that converts input 
+     data of any size into a unique, fixed-length digest (e.g., MD5 = 32 hex 
+     chars, NTLM = 32 hex chars, SHA-1 = 40 hex chars, SHA-256 = 64 hex chars).
+   • Operating systems and applications store hashes rather than plaintext 
+     passwords so that an attacker who gains read access to storage (such as 
+     the Windows SAM registry hive or Linux /etc/shadow) cannot immediately 
+     obtain usable credentials.
+
+2. DICTIONARY ATTACKS & WEAK PASSWORD VULNERABILITY:
+   • A dictionary attack pre-computes hashes for candidate words from a pre-defined 
+     wordlist (e.g., rockyou.txt) and compares them against target hashes.
+   • Weak/short passwords fall in seconds because GPUs process millions to 
+     billions of hash comparisons per second.
+
+3. FORENSIC TROUBLESHOOTING & HASHCAT MECHANICS:
+   • Token Length Validation: Hashcat enforces strict string length limits per 
+     hash mode (e.g., MD5 mode -m 0 requires exactly 32 hex characters). Extra 
+     spaces, terminal stdout artifacts (like md5sum ' *-'), or Windows line 
+     feed characters (\r\n) trigger 'Token length exceptions'.
+   • Potfile Caching: Once Hashcat cracks a digest, it caches the result in 
+     'hashcat.potfile'. Subsequent runs will hide already-cracked hashes unless 
+     inspected with '--show' or bypassed with '--potfile-disable'.
+   • Wordlist Exhaustion: When Hashcat reports 'Status: Exhausted' with partial 
+     recovery (e.g., Recovered 1/3 Digests), it confirms all input hashes were 
+     loaded successfully, but only 1 digest matched a word in the dictionary.
+
+4. ENTERPRISE PASSWORD POLICY IMPLICATIONS:
+   • Length over complexity: Exponentially expanding character length (14+ 
+     character passphrases) increases keyspace far more effectively than adding 
+     isolated special characters to short dictionary words.
+   • Multi-Factor Authentication (MFA) must complement password policies to 
+     neutralize offline credential cracking attempts.
+
+5. LAB EXECUTION RECORD:
+   • Target Hashes (MD5 / Mode 0): 
+     - f25a2fc72690b780b2a14e140ef6a9e0 -> "iloveyou" (CRACKED)
+     - 5d41402abc4b2a76b9719d911017c592 -> "hello"    (CRACKED)
+     - 098f6bcd4621d373cade4e832627b4f6 -> "test"     (CRACKED)
+   • Command Used:
+     ./hashcat.exe -m 0 hello.txt ./rockyou.txt --potfile-disable
+
+
+================================================================================
+AUTH.LOG BRUTE FORCE REINFORCEMENT & PIVOT STRATEGY
+================================================================================
+
+1. LOG EVIDENCE: FAILED VS. SUCCESSFUL BRUTE FORCE:
+   • Query Executed: grep 'Accepted password' auth.log
+   • Result: Empty output (0 matching entries).
+   • Interpretation: The SSH brute-force campaign consisted strictly of failed 
+     authentication attempts ('Failed password' entries). The attacker never 
+     guessed a valid password, and access control held.
+
+2. DISTINGUISHING ATTACK OUTCOMES IN LOG FORENSICS:
+   • Failed Brute Force: High volume of 'Failed password for root from 163.27.187.39' 
+     logs without matching PAM session establishment events.
+
+3. INCIDENT RESPONSE PIVOT STRATEGY (HYPOTHETICAL SUCCESSFUL BREACH):
+   If an 'Accepted password' entry had been present, IR workflow dictates:
+   • Step 1 (Identify Scope): Filter auth.log for the compromised username and 
+     associated SSH PID to establish initial foothold timestamp and source IP.
+   • Step 2 (Command History): Inspect host execution logs (auditd, sysmon, 
+     ~/.bash_history) to identify post-exploitation activity.
+   • Step 3 (Persistence Check): Inspect /etc/passwd, ~/.ssh/authorized_keys, 
+     crontab entries, and systemd units created around the timestamp of access.
+
