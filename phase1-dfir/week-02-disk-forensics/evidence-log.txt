@@ -64,3 +64,17 @@ Email | Target: wilsonjimmy807@gmail.com | Sender: jose.badguy@hushmail.com  | P
 Email | Target: wilsonjimmy807@gmail.com | Sender: mail-noreply@google.com   | Parsed Files: 3 EMLs  | Topic: Account Alerts
 
 
+===============================================================================
+Day 12 - CHRONOLOGICAL TIMELINE OF EVENTS (WAT)
+           Date: September 30, 2026
+===============================================================================
+[2014-02-10 14:57:01] - WEB: User searched/visited Zebra ZXP Series 8 ID card printer site.
+[2014-02-10 15:06:12] - WEB: User visited 'idtheftcenter.org'.
+[2014-02-10 15:18:35] - WEB: Search query executed: "how to disappear without a trace".
+[2014-02-11 14:35:22] - WEB: Search query executed: "handguns".
+[2014-02-11 14:38:52] - WEB: Search query executed: "how to steal identities".
+[2015-05-26 13:46:13] - LNK: Created/opened 'NewPrices.txt' on Desktop.
+[2015-05-26 13:46:15] - LNK: Created/opened 'New Price List.txt' on Desktop.
+[2015-05-26 13:46:16] - LNK: Created/opened 'New Price List Encoded.TXT' on Desktop.
+[2015-05-26]          - MRU: Administrative execution of 'taskschd.msc' (Task Scheduler) 
+                        and 'compmgmt.msc' (Computer Management) recorded in NTUSER.DAT.

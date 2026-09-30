@@ -361,7 +361,7 @@ Date: September 25, 2026
 
 ================================================================================
 DAY 10 - WIRESHARK ATTACK PCAP ANALYSIS
-          Date: September 26 - 27, 2026
+          Date: September 26 - 28, 2026
 ===============================================================================
 1. ATTACK ACTIVITY SUMMARY
 -------------------------------------------------------------------------------
@@ -435,7 +435,7 @@ DAY 10 - WIRESHARK ATTACK PCAP ANALYSIS
 
 ================================================================================
 Day 11: PASSWORD HASH ANALYSIS, HASHCAT AUDITING AND LOG ANALYSIS REINFORCEMENT
-        Date: September 28, 2026
+        Date: September 29, 2026
 ================================================================================
 
 1. WHAT IS A HASH & WHY PASSWORDS ARE STORED THIS WAY:
@@ -505,3 +505,78 @@ AUTH.LOG BRUTE FORCE REINFORCEMENT & PIVOT STRATEGY
    • Step 3 (Persistence Check): Inspect /etc/passwd, ~/.ssh/authorized_keys, 
      crontab entries, and systemd units created around the timestamp of access.
 
+
+================================================================================
+Day 12 - FORMAL EVIDENCE LOG & FORENSIC INVESTIGATION REPORT
+         Date: September 30, 2026
+================================================================================
+
+1. EVIDENCE PRESERVATION & CHAIN OF CUSTODY
+--------------------------------------------------------------------------------
+Case Name............: Week-02-Practice-Investigation
+Analyst..............: Victor Nkereuwem (Eskor)
+Date Loaded..........: Sep 23, 2026
+Image Filename.......: 2020JimmyWilson.E01 (891.29 MB)
+Verified MD5 Hash....: b267fb0cd94645425eee00258d3a9b58
+SHA-256 Hash.........: a1102c70a50768b588225fdcad6efa5d5d57341b
+Hash Verification....: PASSED (Match confirmed against initial acquisition)
+Storage Location.....: Local Workstation & Private GitHub Repository
+Chain of Custody.....: Image acquired unmodified. Hash verified before and after 
+                       analysis. No changes made to original evidence.
+
+
+2. EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Forensic analysis of image '2020JimmyWilson.E01' reveals user 'jimmy wilson' 
+(SID: S-1-5-21-1171287513-3642516788-2358256967-1004) engaged in insider threat 
+and identity fraud preparation. Artefacts confirm web searches regarding identity 
+theft and evasion, installation of ID card printer drivers, communication with 
+external malicious actors via encrypted/suspicious email channels, and staging 
+of sensitive documents using TrueCrypt encryption and KeePass.
+
+
+3. CHRONOLOGICAL TIMELINE OF EVENTS (WAT)
+--------------------------------------------------------------------------------
+[2014-02-10 14:57:01] - WEB: Visited Zebra ZXP Series 8 ID printer product page.
+[2014-02-10 15:06:12] - WEB: Visited 'http://www.idtheftcenter.org/'.
+[2014-02-10 15:18:35] - WEB: Searched "how to disappear without a trace".
+[2014-02-11 14:35:22] - WEB: Searched "handguns".
+[2014-02-11 14:38:52] - WEB: Searched "how to steal identities".
+[2015-05-26 13:46:13] - LNK: Access recorded for 'NewPrices.txt'.
+[2015-05-26 13:46:15] - LNK: Access recorded for 'New Price List.txt'.
+[2015-05-26 13:46:16] - LNK: Access recorded for 'New Price List Encoded.TXT'.
+[2015-05-26]          - MRU: Admin console execution ('taskschd.msc', 'compmgmt.msc').
+
+
+4. KEY ARTEFACTS RECOVERED
+--------------------------------------------------------------------------------
+• OS Accounts: Target account identified as 'jimmy wilson' (Domain scope).
+• Search History: Explicit queries indicating criminal intent ("how to steal 
+  identities", "how to disappear without a trace", "handguns").
+• Installed Hardware/Software: Zebra ZXP Series 8 Printer Drivers installed 
+  (enabling physical ID card fabrication); TrueCrypt 7.1a and KeePass 2.24 installed.
+• Stolen/Sensitive Data: Hits on 'passwords.txt' (158 hits) and 'IDtheftrev.pdf' 
+  (2104 keyword hits across 31 unique files).
+• Communications: Extracted 23 EML files from external actors 'robert.ripoff@gmx.com' 
+  and 'jose.badguy@hushmail.com' detailing operational directives and staging.
+• LNK/MRU Artifacts: Recent shortcut creation for encoded price lists and 
+  Task Scheduler execution via 'taskschd.msc'.
+
+
+5. CONCLUSIONS
+--------------------------------------------------------------------------------
+The evidence indicates intentional insider exfiltration, identity theft preparation, 
+and unauthorized document encoding by user Jimmy Wilson. The correlation between 
+web searches for identity theft, installed driver software for physical ID card 
+printers, and incoming communications from suspicious external parties confirms 
+premeditated malicious activity rather than a external malware compromise.
+
+
+6. RECOMMENDED NEXT STEPS
+--------------------------------------------------------------------------------
+1. Decrypt Encrypted Volumes: Attempt password recovery against KeePass databases 
+   and TrueCrypt containers using wordlists derived from recovered emails and text files.
+2. Mail Server Audit: Perform server-side header analysis on EML files to trace source 
+   IP addresses for 'robert.ripoff@gmx.com' and 'jose.badguy@hushmail.com'.
+3. Task Scheduler Forensic Inspection: Inspect scheduled tasks configured via 
+   'taskschd.msc' to check for automated data exfiltration scripts or persistence mechanisms.
