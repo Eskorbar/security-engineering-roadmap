@@ -580,3 +580,67 @@ premeditated malicious activity rather than a external malware compromise.
    IP addresses for 'robert.ripoff@gmx.com' and 'jose.badguy@hushmail.com'.
 3. Task Scheduler Forensic Inspection: Inspect scheduled tasks configured via 
    'taskschd.msc' to check for automated data exfiltration scripts or persistence mechanisms.
+
+
+===============================================================================
+DAY 13 - ADVANCED WIRESHARK FILTERS & DEEP PCAP ANALYSIS
+===============================================================================
+Analyst..............: Victor Nkereuwem (Eskor)
+Date.................: Oct 01, 2026
+Focus Area...........: Network Forensics & PCAP Filtering Logic
+
+-------------------------------------------------------------------------------
+FILTER BREAKDOWN & INVESTIGATIVE APPLICATIONS
+-------------------------------------------------------------------------------
+
+1. tcp.flags.syn==1 && tcp.flags.ack==0
+   • What it's looking for: TCP packets with only the SYN flag set (initial 
+     connection requests) without an accompanying ACK flag.
+   • When to use it: Port scanning detection (e.g., Nmap SYN stealth scans) 
+     or SYN flood Denial-of-Service (DoS) attacks. A single source IP generating 
+     hundreds of these across sequential ports in a short timeframe indicates 
+     active network reconnaissance.
+
+2. http.request.method == "POST"
+   • What it's looking for: HTTP traffic sending data from the client to the server.
+   • When to use it: Isolating potential credential submission (login forms), 
+     file uploads, form data, or outbound C2 beacons exfiltrating stolen 
+     host parameters (`ip`, `ua`, Base64 strings) over unencrypted web traffic.
+
+3. frame contains "password"
+   • What it's looking for: Case-sensitive raw byte pattern matching for 
+     the literal ASCII string "password" anywhere in the packet layer frame.
+   • When to use it: Quick triage for cleartext credential transmission over 
+     unencrypted protocols (HTTP, FTP, Telnet, POP3, IMAP) or hunting for 
+     hardcoded strings inside unencoded HTTP POST bodies.
+
+4. ip.src == 192.168.1.1 && tcp.port == 22
+   • What it's looking for: Packets originating specifically from IP 192.168.1.1 
+     where the TCP source or destination port is 22 (Secure Shell / SSH).
+   • When to use it: Monitoring remote administrative sessions, detecting 
+     unauthorized SSH connections originating from high-risk hosts, or 
+     tracing lateral movement attempts utilizing SSH tunneling or SCP/SFTP.
+
+5. dns.qry.name contains "google"
+   • What it's looking for: DNS lookup queries containing the sub-string "google" 
+     within the requested domain name field.
+   • When to use it: Analyzing client connectivity, filtering noise during DNS 
+     triage, or detecting domain spoofing/phishing attempts that register 
+     typosquatted domains (e.g., `google-login-verify.com`).
+
+
+------ to run wireshark on my erminal -------
+ tshark -r capture.pcap -Y 'http.request.method == "POST"' -T fields -e ip.src -e ip.dst -e http.host
+
+
+-------------------------------------------------------------------------------
+ WIRESHARK FILTERS DEEPER
+-------------------------------------------------------------------------------
+
+→ Open a PCAP from yesterday or capture new traffic
+→ Practise these advanced filters:
+  tcp.flags.syn==1 && tcp.flags.ack==0      → SYN scan (port scanning)
+  http.request.method == "POST"             → data being submitted (credentials?)
+  frame contains "password"                 → literal password in packet
+  ip.src == 192.168.1.1 && tcp.port == 22   → SSH from specific host
+  dns.qry.name contains "google"            → DNS queries to Google
