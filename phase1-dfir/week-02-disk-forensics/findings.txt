@@ -629,7 +629,7 @@ FILTER BREAKDOWN & INVESTIGATIVE APPLICATIONS
      typosquatted domains (e.g., `google-login-verify.com`).
 
 
------- to run wireshark on my erminal -------
+------- to run wireshark on my erminal --------
  tshark -r capture.pcap -Y 'http.request.method == "POST"' -T fields -e ip.src -e ip.dst -e http.host
 
 
