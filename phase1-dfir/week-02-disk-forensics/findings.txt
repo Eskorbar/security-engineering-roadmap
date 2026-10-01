@@ -583,7 +583,7 @@ premeditated malicious activity rather than a external malware compromise.
 
 
 ===============================================================================
-DAY 13 - ADVANCED WIRESHARK FILTERS & DEEP PCAP ANALYSIS
+DAY 12 - ADVANCED WIRESHARK FILTERS & DEEP PCAP ANALYSIS
 ===============================================================================
 Analyst..............: Victor Nkereuwem (Eskor)
 Date.................: Oct 01, 2026
