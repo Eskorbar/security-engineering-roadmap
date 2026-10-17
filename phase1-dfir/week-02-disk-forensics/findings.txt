@@ -583,7 +583,7 @@ premeditated malicious activity rather than a external malware compromise.
 
 
 ===============================================================================
-DAY 13 - ADVANCED WIRESHARK FILTERS & DEEP PCAP ANALYSIS
+DAY 13  - ADVANCED WIRESHARK FILTERS & DEEP PCAP ANALYSIS
 ===============================================================================
 Analyst..............: Victor Nkereuwem (Eskor)
 Date.................: Oct 01, 2026
@@ -644,3 +644,28 @@ FILTER BREAKDOWN & INVESTIGATIVE APPLICATIONS
   frame contains "password"                 → literal password in packet
   ip.src == 192.168.1.1 && tcp.port == 22   → SSH from specific host
   dns.qry.name contains "google"            → DNS queries to Google
+
+
+================================================================================
+DAY 14  - REGISTRY, PREFETCH AND NMAP
+===============================================================================
+Analyst..............: Victor Nkereuwem (Eskor)
+Date.................: Oct 10, 2026
+Focus Area...........: Network Forensics & PCAP Filtering Logic
+
+-------------------------------------------------------------------------------
+[ARTIFACT 1: NTUSER.DAT - Run Key]
+- Location: Users\[Username]\NTUSER.DAT -> Software\Microsoft\Windows\CurrentVersion\Run
+- What it proves: Which applications are configured to launch automatically upon user login.
+- Why it matters: Critical for identifying persistence mechanisms used by malware or unauthorized software.
+
+[ARTIFACT 2: NTUSER.DAT - RecentDocs]
+- Location: Users\[Username]\NTUSER.DAT -> Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+- What it proves: The specific files and document types the user recently opened.
+- Why it matters: Establishes intent, user activity, and connection to specific files relevant to the case.
+
+[ARTIFACT 3: Windows Prefetch Files]
+- Location: C:\Windows\Prefetch\*.pf
+- What it proves: Evidence of application execution, including the specific timestamp and how many times it ran.
+- Why it matters: Proves a program was actually executed on the system, even if the application itself has since been deleted.
+======================================================================
