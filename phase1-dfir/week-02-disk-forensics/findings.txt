@@ -669,3 +669,18 @@ Focus Area...........: Network Forensics & PCAP Filtering Logic
 - What it proves: Evidence of application execution, including the specific timestamp and how many times it ran.
 - Why it matters: Proves a program was actually executed on the system, even if the application itself has since been deleted.
 ======================================================================
+
+================================================================================
+DAY 15  -  Disk Forensics Article + NSE 1
+===============================================================================
+Analyst..............: Victor Nkereuwem (Eskor)
+Date.................: Oct 15, 2026
+Focus Area...........: Hashnode Article and publication
+
+-------------------------------------------------------------------------------
+Investigated a forensic disk image using Autopsy & Zimmerman tools. 
+
+My biggest takeaway: The hash comes first. If you can't prove evidence wasn't tampered with via SHA-256, nothing else you find matters.
+
+https://iameskor.hashnode.dev/what-i-found-inside-a-forensic-disk-image-using-autopsy-zimmerman-tools
+======================================================================
