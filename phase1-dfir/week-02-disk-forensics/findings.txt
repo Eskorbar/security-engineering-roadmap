@@ -637,8 +637,7 @@ FILTER BREAKDOWN & INVESTIGATIVE APPLICATIONS
  WIRESHARK FILTERS DEEPER
 -------------------------------------------------------------------------------
 
-→ Open a PCAP from yesterday or capture new traffic
-→ Practise these advanced filters:
+→ → Practise these advanced filters:
   tcp.flags.syn==1 && tcp.flags.ack==0      → SYN scan (port scanning)
   http.request.method == "POST"             → data being submitted (credentials?)
   frame contains "password"                 → literal password in packet
@@ -684,3 +683,32 @@ My biggest takeaway: The hash comes first. If you can't prove evidence wasn't ta
 
 https://iameskor.hashnode.dev/what-i-found-inside-a-forensic-disk-image-using-autopsy-zimmerman-tools
 ======================================================================
+
+
+================================================================================
+DAY 16  -  Ports Table + From-Memory Check
+===============================================================================
+Analyst..............: Victor Nkereuwem (Eskor)
+Date.................: Oct 16, 2026
+
+-------------------------------------------------------------------------------
+(a) What does the SHA-256 hash in an evidence log prove?
+  The SHA-256 hash proves the cryptographic integrity and authenticity of digital evidence.
+  It verifies that the disk image or file has not been altered, tampered with,
+  or corrupted since the time of acquisition, preserving the forensic chain of custody.
+  
+(b) What does repeated Event ID 4625 followed by 4624 mean?
+  Repeated Event ID 4625 (Failed Logon)followed by Event ID 4624 (Successful Logon)
+  indicates a successful brute-force or credential-guessing attack. The sequence shows
+  an attacker systematically attempting multiple incorrect passwords until
+  finding the correct credentials to gain unauthorized access.
+  
+(c) Why is port 3306 open to the internet a problem?
+  Port 3306 is the default port for MySQL database management, which is an internal backend service
+  not designed to face the public internet directly. Leaving it open exposes the database to automated
+  brute-force attacks, remote unauthenticated exploitation, and direct SQL data exfiltration or destruction.
+  
+(d) What does a Prefetch file prove?
+  A Prefetch file (.pf) proves proof of execution for a specific application on a Windows system.
+  It records the executable name, exact execution timestamps (first and last run), run count,
+  and referenced file paths/DLLs—proving a program was launched even if the original executable file was deleted.

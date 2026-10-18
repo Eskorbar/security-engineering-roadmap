@@ -87,3 +87,28 @@ hashcat -m 0 hash.txt rockyou.txt --show
 # ---------------------------------------------------------
 # Check auth.log for successful password authentications
 grep 'Accepted password' auth.log
+
+
+# ==============================================================================
+# Day 16 - NETWORK PORTS SECURITY ASSESSMENT TABLE
+# ==============================================================================
+# Guidelines:
+# 1. Public Exposure (YES): Only services intended for unauthenticated/public access (e.g., HTTP/HTTPS, public DNS).
+# 2. Restricted Exposure (NO / VPN / IP Allowlist): Administrative (SSH, RDP) and Database (MySQL, SMB) ports.
+# 3. Plaintext Protocols (NO): Insecure protocols (Telnet, FTP) that transmit credentials unencrypted must be disabled/replaced.
+# ==============================================================================
+#
+# | Port | Protocol | Service | Internet-Facing? | Justification & Security Guidance |
+# |------|----------|---------|------------------|---------------------------------------------------------------------------------------------------|
+# | 21   | TCP      | FTP     | NO               | Transmits credentials and data in plaintext. Replace with SFTP (Port 22) or FTPS (Port 990).
+# | 22   | TCP      | SSH     | NO (VPN/IP Only) | High-value admin target. Restrict to internal management VPN or explicit source IP allowlist + key auth.
+# | 23   | TCP      | Telnet  | NO               | Obsolete and insecure. Transmits data/passwords in cleartext. Replace with SSH.
+# | 25   | TCP      | SMTP    | RESTRICTED       | Allow publicly ONLY if operating an inbound Mail Transfer Agent (MTA). Block or require auth/TLS.
+# | 53   | TCP/UDP  | DNS     | YES (If Public)  | Required for public domain name resolution. Restrict recursive queries to prevent DNS amplification.
+# | 80   | TCP      | HTTP    | YES              | Public web server port. Must auto-redirect all incoming traffic to HTTPS (Port 443).
+# | 443  | TCP      | HTTPS   | YES              | Standard encrypted public web traffic (TLS). Default baseline for facing the public internet.
+# | 445  | TCP      | SMB     | NO               | Critical Windows file-sharing protocol. High risk for wormable exploits (e.g., EternalBlue). Internal only.
+# | 3306 | TCP      | MySQL   | NO               | Database management. Should only accept local loopback connections or requests from app servers.
+# | 3389 | TCP      | RDP     | NO (VPN/IP Only) | High-priority target for brute-force/ransomware. Limit strictly to Zero Trust/VPN or Jump Box gateways.
+#
+# ==============================================================================
