@@ -1,0 +1,19 @@
+========================================================================
+DAY 17 - Wireshark Foundations + tcpdump
+Date: October 20, 2026
+========================================================================
+
+1. 3 DNS Lookups and What Each Tells You:
+   - Standard A/AAAA Record Query (e.g., SaaS, updates): Establishes baseline operational traffic and legitimate enterprise tool usage.
+   - High-Entropy Subdomain Query (randomized strings): Indicates potential Domain Generation Algorithm (DGA) activity or DNS tunneling used to bypass firewalls and exfiltrate data.
+   - Repeated NXDOMAIN (Non-Existent Domain) Floods: Highlights malware checking for internet connectivity or scanning for active Command and Control (C2) servers.
+
+2. Server Followed (TCP Stream Analysis):
+   - Used Wireshark's "Follow TCP Stream" feature on an external IP conversation to reconstruct the raw application-layer session (HTTP/plaintext protocols), revealing exact data payloads, requested paths, or unencrypted authentication.
+
+3. What a Port Scan Looks Like in Wireshark:
+   - Appears as a rapid, sequential/randomized wave of TCP SYN packets originating from a single source IP across dozens or hundreds of ports. Closed ports reply with `RST, ACK`; open ports reply with `SYN, ACK`.
+
+4. When to Use `tcpdump`:
+   - Use on headless/remote servers via SSH where a GUI is unavailable.
+   - Use in low-resource environments or for rapid live captures (`-w capture.pcap`) and quick inline terminal inspection before pulling `.pcap` files down for deep analysis in Wireshark.
