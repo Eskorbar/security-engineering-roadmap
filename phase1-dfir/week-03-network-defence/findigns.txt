@@ -17,3 +17,41 @@ Date: October 20, 2026
 4. When to Use `tcpdump`:
    - Use on headless/remote servers via SSH where a GUI is unavailable.
    - Use in low-resource environments or for rapid live captures (`-w capture.pcap`) and quick inline terminal inspection before pulling `.pcap` files down for deep analysis in Wireshark.
+
+========================================================================
+DAY 18 - Hydra + fail2ban (Attack and Defence)
+Date:November 02, 2026
+========================================================================
+
+1. WHY WEAK PASSWORDS FALL FAST (HYDRA CONCEPTS)
+- Hydra is a parallelized login cracker supporting dozens of network protocols (SSH, FTP, HTTP, SMB, etc.).
+- Because it opens multiple simultaneous connections (-t) and tests common leaked passwords from wordlists
+   (like rockyou.txt) at machine speed, predictable passwords fall in seconds.
+
+2. ATTACK SIDE (HYDRA & AUTH.LOG)
+- Hydra success output:
+  [22][ssh] host: 127.0.0.1   login: testuser   password: sunshine123
+
+- Log evidence in /var/log/auth.log:
+  sshd-session[...]: Failed password for testuser from 127.0.0.1 port ... ssh2
+  (Followed by: PAM 4 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1 user=testuser)
+
+3. DEFENCE SIDE (FAIL2BAN BAN CONFIRMATION)
+- After enabling the [sshd] jail (maxretry = 3, bantime = 600) and running Hydra with wrong passwords, fail2ban detected the repeated failures and blocked the attacking IP:
+  Status for the jail: sshd
+  |- Filter
+  |  |- Currently failed: 3
+  |  |- Total failed:     3
+  `- Actions
+     |- Currently banned: 1
+     |- Total banned:     1
+     `- Banned IP list:   127.0.0.1
+
+4. THREE DEFENCES AGAINST SSH BRUTE FORCE
+   - Fail2ban (or rate-limiting): Automatically parses authentication logs and dynamically adds firewall drop rules to ban offending IPs after a threshold of failed attempts.
+   - SSH Key-Based Authentication Only: Disabling PasswordAuthentication in /etc/ssh/sshd_config removes password-guessing attack vectors completely.
+   - Firewall Allow-Listing / Non-Standard Port: Restricting port 22 via UFW/iptables to trusted admin IPs (and/or moving SSH off port 22) blocks automated internet-wide scanners from reaching sshd.
+
+5. SELF-CHECK
+   - Network IP vs 127.0.0.1: fail2ban ignores 127.0.0.1/8 by default so local processes do not lock out the host machine.
+   - SSH keys vs fail2ban: fail2ban reacts only after failed attempts occur (and struggles against distributed botnets), whereas SSH keys prevent password brute-forcing entirely.
