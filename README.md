@@ -1,5 +1,5 @@
 # Security Engineering Roadmap
-#### A 24-week hands-on journey to becoming a Security Architect
+#### A 84days hands-on journey to becoming a Security Architect
 #### with a specialisation in Digital Forensics and Incident Response (DFIR).
 
 
@@ -12,8 +12,8 @@
 | **Phase** | **Topic** | **Status** |
 |---|---|---|
 | Phase 1 - Week 1 | Linux CLI \& log analysis | Done |
-| Phase 1 - Week 2 | Disk forensics | In progress  |
-| Phase 1 - Week 3 | Memory forensics | Not started |
+| Phase 1 - Week 2 | Disk forensics | Done  |
+| Phase 1 - Week 3 | Memory forensics | In progress |
 | Phase 2 - Week 4 | Cloud IAM hardening | Not started |
 
 
@@ -28,17 +28,18 @@
 
 ## Certifications
 - ✅ Google Cybersecurity Professional Certificate
+- ✅ CISCO Introduction to Cybersecurity
 - Frotinet NSE Certification Program
   - - NSE 1 - SP
   - - NSE 2 - SP
   - - NSE 3 - SP
 - ⬜ AWS Security Specialty
 - ⬜ CompTIA Security+
-- ⬜ BTL1 — Blue Team Labs Level 1
+- ⬜ BTL1 - Blue Team Labs Level 1
 
 ##### 
 
 ## Daily commitment
-#### Pushing something to this repo every single day.
+#### Pushing something to this repo regularly.
 
 # *Wish me luck!*
