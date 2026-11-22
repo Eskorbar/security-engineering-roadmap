@@ -30,7 +30,7 @@ Date:November 02, 2026
 
 2. ATTACK SIDE (HYDRA & AUTH.LOG)
 - Hydra success output:
-  [22][ssh] host: 127.0.0.1   login: testuser   password: sunshine123
+  [22][ssh] host: 127(dot)0(dot)0(dot)1   login: testuser   password: sunshine123
 
 - Log evidence in /var/log/auth.log:
   sshd-session[...]: Failed password for testuser from 127.0.0.1 port ... ssh2
@@ -45,7 +45,7 @@ Date:November 02, 2026
   `- Actions
      |- Currently banned: 1
      |- Total banned:     1
-     `- Banned IP list:   127.0.0.1
+     `- Banned IP list:   127(dot)0(dot)0(dot)1
 
 4. THREE DEFENCES AGAINST SSH BRUTE FORCE
    - Fail2ban (or rate-limiting): Automatically parses authentication logs and dynamically adds firewall drop rules to ban offending IPs after a threshold of failed attempts.
@@ -53,5 +53,5 @@ Date:November 02, 2026
    - Firewall Allow-Listing / Non-Standard Port: Restricting port 22 via UFW/iptables to trusted admin IPs (and/or moving SSH off port 22) blocks automated internet-wide scanners from reaching sshd.
 
 5. SELF-CHECK
-   - Network IP vs 127.0.0.1: fail2ban ignores 127.0.0.1/8 by default so local processes do not lock out the host machine.
+   - Network IP vs 127.0.0.1: fail2ban ignores 127(dot)0(dot)0(dot)1/8 by default so local processes do not lock out the host machine.
    - SSH keys vs fail2ban: fail2ban reacts only after failed attempts occur (and struggles against distributed botnets), whereas SSH keys prevent password brute-forcing entirely.
