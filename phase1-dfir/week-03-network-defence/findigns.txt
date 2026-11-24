@@ -59,7 +59,7 @@ Date:November 02, 2026
   
   
 ========================================================================
-DAY 19 - Self-Assessment + CyberDefenders
+DAY 19 - Self-Assessment + Guided Investigation
 Date:November 22, 2026
 ========================================================================
 
@@ -95,3 +95,60 @@ Date:November 22, 2026
    Browser History / Downloads (History SQLite DB): Proves which URLs a user visited, search queries made, and malicious files downloaded with timestamps.
    LNK (Shortcut) Files & Jump Lists: Proves a user opened specific local, network, or external USB files—even if the original file was later deleted.
    USBSTOR Registry Key (SYSTEM\CurrentControlSet\Enum\USBSTOR): Proves specific external USB storage devices (vendor, product, serial number) were connected to the machine.
+
+
+========================================================================
+Guided investigation: 026-11-10 - TRAFFIC ANALYSIS EXERCISE: THE LUCKY TURKEY
+Date: November 24, 2026
+========================================================================
+BACKGROUND
+   Working as an analyst at a security operations center (SOC) for a Thanksgiving-themed gambling company, you see alerts for NetSupport RAT on 93.152.209[.]36:443.  Against all odds, you weren't betting on seeing these alerts.
+   But here we are!
+   You retrieve a packet capture (pcap) of traffic from the associated Windows host to review the activity and verify the alerts.
+
+    
+--------------------------------------------------
+
+2. CYBERDEFENDERS LAB INVESTIGATION (PCAP ANALYSIS)
+- Lab Name: <INSERT_LAB_NAME>
+- Tools Used: Wireshark
+
+- Investigation Method & Artefacts (without sharing raw lab answers):
+  (1) Date and Start Time of NetSupport RAT Traffic:
+     - Filter: frame contains "NetSupport"
+     - Method: Set View -> Time Display Format -> UTC Date and Time of Day, sorted ascending by packet number, and read the timestamp on the first matching HTTP C2 packet.
+     - Why it worked: NetSupport Manager transmits cleartext HTTP User-Agent/header strings containing "NetSupport" on initial check-in.
+
+  (2) IP Address and MAC Address of the Infected Windows Client:
+     - Filter: frame contains "NetSupport"
+     - Method: Inspected the first matching packet's IPv4 layer (Source Address) and Ethernet II frame header (Source MAC).
+     - Why it worked: Outbound C2 HTTP requests originate directly from the compromised client's network interface.
+
+  (3) Host Name of the Infected Windows Client:
+     - Filters: dhcp or nbns
+     - Method: Checked DHCP Request Option 12 (Host Name) and NetBIOS Name Service (NBNS) registration packets matching the infected client's MAC/IP address.
+     - Why it worked: Windows workstations broadcast their configured computer name in cleartext during DHCP lease requests and local NBNS registration packets.
+
+  (4) User Account Name from the Infected Windows Client:
+     - Filter: kerberos.cname_string == 1 and !(kerberos.CNameString contains "$")
+     - Method: Added kerberos.CNameString as a custom column in Wireshark and verified the source IP matched the infected Windows client.
+     - Why it worked: Active Directory clients send the logged-in user's principal name in cleartext during Kerberos AS-REQ/TGS-REQ exchanges; excluding "$" filtered out machine accounts (HOSTNAME$) to isolate the user account.
+
+--------------------------------------------------
+
+3. SAVED SOC / JUNIOR ANALYST ROLES (JOB HUNT)
+*(Note: Tick [x] for tools you have already used in this course)*
+
+(1) Role: Tier III Service Desk / Junior SOC Analyst (Remote - Worldwide)
+   - Source: Remotive / LinkedIn
+   - Listed Tools: [x] Wireshark, [x] Linux CLI, [x] Windows Event Logs, [ ] SIEM (Splunk/Sentinel), [ ] EDR, [ ] XDR, [ ] Terraform, [ ] Service Now, [ ] Azure/AWS, [ ] QRadar
+
+(2) Role: Junior SOC Analyst / Security Operations Analyst (Remote - EMEA / Worldwide)
+   - Source: LinkedIn Jobs
+   - Listed Tools: [x] Nmap, [x] Wireshark, [x] Linux Log Analysis (grep/awk), [x] Windows Event IDs, [ ] Splunk
+
+(3) Role: Incident Response / DFIR Junior Analyst (Remote)
+   - Source: LinkedIn Jobs
+   - Listed Tools: [x] Autopsy, [x] Wireshark, [x] Windows Event Logs, [ ] Volatility, [ ] YARA
+
+--------------------------------------------------
